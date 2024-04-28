@@ -11,8 +11,6 @@ Features:
 Future features:
 - Level UP Mod increase experience kill based on distance
 
-https://github.com/LeandroTheDev/level_up/assets/106118473/8409a3ee-08ce-42b6-8747-aa7bf6405a26
-
 ### Observations
 RPG Difficulty simple changes the base max health when new entity spawn
 
