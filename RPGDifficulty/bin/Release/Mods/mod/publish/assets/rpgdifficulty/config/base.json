@@ -1,0 +1,8 @@
+{
+    "enableWhitelist": false,
+    "enableBlacklist": true,
+    "increaseStatsEveryDistance": 500,
+    "lifeStatsIncreaseEveryDistance": 0.1,
+    "damageStatsIncreaseEveryDistance": 0.1,
+    "enableExtendedLog": true
+}

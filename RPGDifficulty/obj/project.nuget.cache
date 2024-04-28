@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "0rBtABDtjIZhDJ3jYccs2DrP/sDZNC/0l37IowlTACGgeKKWJf1SbX4HyaWuHaGD+3+4LwtXQvhVN0jyo5MXNg==",
+  "success": true,
+  "projectFilePath": "/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj",
+  "expectedPackageFiles": [
+    "/home/bobs/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.18/microsoft.aspnetcore.app.ref.7.0.18.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,13 @@
+{
+    "type": "code",
+    "modid": "rpgdifficulty",
+    "name": "RPGDifficulty",
+    "authors": [
+        "BoboDev"
+    ],
+    "description": "Increase entities stats based on world distance",
+    "version": "1.0.0",
+    "dependencies": {
+        "game": ""
+    }
+}
