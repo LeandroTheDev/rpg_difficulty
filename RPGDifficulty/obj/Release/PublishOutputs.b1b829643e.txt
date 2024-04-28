@@ -1,0 +1,7 @@
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/publish/assets/rpgdifficulty/config/base.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/publish/assets/rpgdifficulty/config/blacklist.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/publish/assets/rpgdifficulty/config/whitelist.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/publish/modinfo.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/publish/RPGDifficulty.dll
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/publish/RPGDifficulty.deps.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/publish/RPGDifficulty.pdb

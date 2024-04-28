@@ -1,0 +1,16 @@
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/assets/rpgdifficulty/config/base.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/assets/rpgdifficulty/config/blacklist.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/assets/rpgdifficulty/config/whitelist.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/modinfo.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/RPGDifficulty.deps.json
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/RPGDifficulty.dll
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/bin/Release/Mods/mod/RPGDifficulty.pdb
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/RPGDifficulty.csproj.AssemblyReference.cache
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/RPGDifficulty.GeneratedMSBuildEditorConfig.editorconfig
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/RPGDifficulty.AssemblyInfoInputs.cache
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/RPGDifficulty.AssemblyInfo.cs
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/RPGDifficulty.csproj.CoreCompileInputs.cache
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/RPGDifficulty.dll
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/refint/RPGDifficulty.dll
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/RPGDifficulty.pdb
+/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/Release/ref/RPGDifficulty.dll
