@@ -33,6 +33,7 @@ public class RPGDifficultyModSystem : ModSystem
     {
         Configuration.UpdateBaseConfigurations(api);
         Debug.Log("Configuration set");
+        if (Configuration.enableExtendedLog) Configuration.LogConfigurations();
     }
 
     public override double ExecuteOrder()
