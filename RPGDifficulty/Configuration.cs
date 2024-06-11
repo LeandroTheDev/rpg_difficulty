@@ -13,6 +13,12 @@ public static class Configuration
     public static readonly Dictionary<string, double> blacklist = [];
     public static bool enableWhitelist = false;
     public static bool enableBlacklist = true;
+    public static bool enableStatusIncreaseByHeight = true;
+    public static int increaseStatsEveryDownHeight = 10;
+    public static int baseStatusHeight = 60;
+    public static double lifeStatsIncreaseEveryHeight = 0.1;
+    public static double damageStatsIncreaseEveryHeight = 0.1;
+    public static bool enableStatusIncreaseByDistance = true;
     public static int increaseStatsEveryDistance = 500;
     public static double lifeStatsIncreaseEveryDistance = 0.1;
     public static double damageStatsIncreaseEveryDistance = 0.1;
@@ -35,6 +41,48 @@ public static class Configuration
                 else enableBlacklist = (bool)value;
             else Debug.Log("CONFIGURATION ERROR: enableBlacklist not set");
         }
+        { //enableStatusIncreaseByHeight
+            if (baseConfigs.TryGetValue("enableStatusIncreaseByHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByHeight is null");
+                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableStatusIncreaseByHeight is not boolean is {value.GetType()}");
+                else enableStatusIncreaseByHeight = (bool)value;
+            else Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByHeight not set");
+        }
+        { //increaseStatsEveryDownHeight
+            if (baseConfigs.TryGetValue("increaseStatsEveryDownHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: increaseStatsEveryDownHeight is null");
+                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: increaseStatsEveryDownHeight is not int is {value.GetType()}");
+                else increaseStatsEveryDownHeight = (int)(long)value;
+            else Debug.Log("CONFIGURATION ERROR: increaseStatsEveryDownHeight not set");
+        }
+        { //baseStatusHeight
+            if (baseConfigs.TryGetValue("baseStatusHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: baseStatusHeight is null");
+                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: baseStatusHeight is not int is {value.GetType()}");
+                else baseStatusHeight = (int)(long)value;
+            else Debug.Log("CONFIGURATION ERROR: baseStatusHeight not set");
+        }
+        { //lifeStatsIncreaseEveryHeight
+            if (baseConfigs.TryGetValue("lifeStatsIncreaseEveryHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight is not double is {value.GetType()}");
+                else lifeStatsIncreaseEveryHeight = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight not set");
+        }
+        { //damageStatsIncreaseEveryDistance
+            if (baseConfigs.TryGetValue("damageStatsIncreaseEveryDistance", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is not double is {value.GetType()}");
+                else damageStatsIncreaseEveryDistance = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
+        }
+        { //enableStatusIncreaseByDistance
+            if (baseConfigs.TryGetValue("enableStatusIncreaseByDistance", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByDistance is null");
+                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableStatusIncreaseByDistance is not boolean is {value.GetType()}");
+                else enableStatusIncreaseByDistance = (bool)value;
+            else Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByDistance not set");
+        }
         { //increaseStatsEveryDistance
             if (baseConfigs.TryGetValue("increaseStatsEveryDistance", out object value))
                 if (value is null) Debug.Log("CONFIGURATION ERROR: increaseStatsEveryDistance is null");
@@ -56,6 +104,13 @@ public static class Configuration
                 else damageStatsIncreaseEveryDistance = (double)value;
             else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
         }
+        { //enableExtendedLog
+            if (baseConfigs.TryGetValue("enableExtendedLog", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: enableExtendedLog is null");
+                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableExtendedLog is not boolean is {value.GetType()}");
+                else enableExtendedLog = (bool)value;
+            else Debug.Log("CONFIGURATION ERROR: enableExtendedLog not set");
+        }
 
         // Get whitelist
         whitelist.Clear();
@@ -73,16 +128,23 @@ public static class Configuration
         {
             if (pair.Value is double value) blacklist.Add(pair.Key, (double)value);
             else Debug.Log($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
-        }   
+        }
     }
 
     public static void LogConfigurations()
     {
         Debug.Log($"CONFIG: enableWhitelist, value: {enableWhitelist}");
         Debug.Log($"CONFIG: enableBlacklist, value: {enableBlacklist}");
+        Debug.Log($"CONFIG: enableStatusIncreaseByHeight, value: {enableStatusIncreaseByHeight}");
+        Debug.Log($"CONFIG: increaseStatsEveryDownHeight, value: {increaseStatsEveryDownHeight}");
+        Debug.Log($"CONFIG: baseStatusHeight, value: {baseStatusHeight}");
+        Debug.Log($"CONFIG: lifeStatsIncreaseEveryHeight, value: {lifeStatsIncreaseEveryHeight}");
+        Debug.Log($"CONFIG: damageStatsIncreaseEveryHeight, value: {damageStatsIncreaseEveryHeight}");
+        Debug.Log($"CONFIG: enableStatusIncreaseByDistance, value: {enableStatusIncreaseByDistance}");
         Debug.Log($"CONFIG: increaseStatsEveryDistance, value: {increaseStatsEveryDistance}");
         Debug.Log($"CONFIG: lifeStatsIncreaseEveryDistance, value: {lifeStatsIncreaseEveryDistance}");
         Debug.Log($"CONFIG: damageStatsIncreaseEveryDistance, value: {damageStatsIncreaseEveryDistance}");
+        Debug.Log($"CONFIG: enableExtendedLog, value: {enableExtendedLog}");
     }
     #endregion
 }
