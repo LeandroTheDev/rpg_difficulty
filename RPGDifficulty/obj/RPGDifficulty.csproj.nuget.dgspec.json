@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj": {}
+    "/home/bobs/Templates/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj": {}
   },
   "projects": {
-    "/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj": {
+    "/home/bobs/Templates/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj",
+        "projectUniqueName": "/home/bobs/Templates/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj",
         "projectName": "RPGDifficulty",
-        "projectPath": "/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj",
+        "projectPath": "/home/bobs/Templates/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj",
         "packagesPath": "/home/bobs/.nuget/packages/",
-        "outputPath": "/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/obj/",
+        "outputPath": "/home/bobs/Templates/RPGDifficulty/RPGDifficulty/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/bobs/.nuget/NuGet/NuGet.Config"
@@ -51,7 +51,7 @@
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[7.0.18, 7.0.18]"
+              "version": "[7.0.20, 7.0.20]"
             }
           ],
           "frameworkReferences": {
@@ -59,7 +59,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.104/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/7.0.120/RuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Timers;
-using HarmonyLib;
 using LevelUP;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Server;
-using Vintagestory.API.Util;
 using Vintagestory.GameContent;
 
 namespace RPGDifficulty;
@@ -28,7 +23,7 @@ public class RPGDifficultyModSystem : ModSystem
     {
         base.Start(api);
         Debug.LoadLogger(api.Logger);
-        Debug.Log("Running on Version: 1.0.0");
+        Debug.Log("Running on Version: 1.0.1");
 
         // Overwrite native functions
         overwriter.OverwriteNativeFunctions(api);
@@ -59,28 +54,50 @@ public class RPGDifficultyModSystem : ModSystem
         // Function for increasing entity stats
         void increaseStats()
         {
-            int statsIncrease = 0;
+            int statsIncreaseDistance = 0;
+            int statsIncreaseHeight = 0;
             // Stats increasing
             {
+                // Coordinates
                 double entityX = entity.Pos.X - serverAPI.World.DefaultSpawnPosition.X;
                 double entityZ = entity.Pos.Z - serverAPI.World.DefaultSpawnPosition.Z;
+                double entityY = entity.Pos.Y;
+
+                // XZ Coordinates translations
                 if (entityX < 0) entityX = Math.Abs(entityX);
                 if (entityZ < 0) entityZ = Math.Abs(entityZ);
-                while (true)
-                {
-                    if (entityX <= Configuration.increaseStatsEveryDistance && entityZ <= Configuration.increaseStatsEveryDistance) break;
 
-                    // Reduce X
-                    if (entityX > Configuration.increaseStatsEveryDistance)
+                // Distance calculation
+                if (Configuration.enableStatusIncreaseByDistance)
+                {
+                    while (true)
                     {
-                        entityX -= Configuration.increaseStatsEveryDistance;
-                        statsIncrease++;
+                        if (entityX <= Configuration.increaseStatsEveryDistance && entityZ <= Configuration.increaseStatsEveryDistance) break;
+
+                        // Reduce X
+                        if (entityX > Configuration.increaseStatsEveryDistance)
+                        {
+                            entityX -= Configuration.increaseStatsEveryDistance;
+                            statsIncreaseDistance++;
+                        }
+                        // Reduce Z
+                        if (entityZ > Configuration.increaseStatsEveryDistance)
+                        {
+                            entityZ -= Configuration.increaseStatsEveryDistance;
+                            statsIncreaseDistance++;
+                        }
                     }
-                    // Reduce Z
-                    if (entityZ > Configuration.increaseStatsEveryDistance)
+                }
+
+                // Height Calculation
+                if (Configuration.enableStatusIncreaseByHeight)
+                {
+                    while (true)
                     {
-                        entityZ -= Configuration.increaseStatsEveryDistance;
-                        statsIncrease++;
+                        if (entityY >= Configuration.baseStatusHeight || (entityY + Configuration.increaseStatsEveryDownHeight) >= Configuration.baseStatusHeight) break;
+
+                        entityY += Configuration.increaseStatsEveryDownHeight;
+                        statsIncreaseHeight++;
                     }
                 }
             }
@@ -89,15 +106,16 @@ public class RPGDifficultyModSystem : ModSystem
             if (entityLifeStats != null)
             {
                 if (Configuration.enableExtendedLog)
-                    Debug.Log($"{entity.Code} increasing max health in: {(int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncrease))}, damage: {Configuration.damageStatsIncreaseEveryDistance * statsIncrease}");
+                    Debug.Log($"{entity.Code} increasing max health in: {(int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance)) + (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight))}, damage: {Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance}");
 
                 // Increase entity max health
-                entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncrease));
-                entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncrease));
-                // Increase tntiy actual health
-                entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryDistance * statsIncrease));
+                entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance)) + (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
+                entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance)) + (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
+                // Increase entity actual health
+                entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance)) + (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
             }
-            entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncrease", Configuration.damageStatsIncreaseEveryDistance * statsIncrease);
+            entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseDistance", Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance);
+            entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseHeight", Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight);
         }
 
         // Blacklist Check

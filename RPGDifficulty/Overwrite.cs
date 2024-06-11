@@ -1,11 +1,9 @@
 using System;
-using System.Linq;
 using HarmonyLib;
 using LevelUP;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
-using Vintagestory.API.Server;
 using Vintagestory.API.Util;
 
 namespace RPGDifficulty;
@@ -78,13 +76,28 @@ class LevelUPCompatibility
             // Not in whitelist
             else { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is not on whitelist, ignoring damage"); return; }
 
+        float oldDamage = damage;
+        // Increase the damage
+        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
+        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+
         if (Configuration.enableExtendedLog)
-            Debug.Log($"{entityDamaged.Code} damage increased by {damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncrease")}");
+            Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
 
         // Add this damage at final calculation of level up
-        __instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"] = new EntityFloatStats();
-
-        __instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"].Set("DamageFinish", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncrease")), true);
+        if (__instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"] == null)
+        {
+            // Simple create new stats if not exist
+            __instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"] = new EntityFloatStats();
+            __instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"].Set("DamageFinish", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
+        }
+        else
+        {
+            // Some other mod has already created the a finish calculation variable lets get it
+            float entityAdditionalDamage = __instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage");
+            // We set now the variable as the: previous additional damage from other mod plus ours new damage
+            __instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"].Set("DamageFinish", entityAdditionalDamage + (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
+        }
     }
 }
 
@@ -118,8 +131,13 @@ class DamageInteraction
             // Not in whitelist
             else { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is not on whitelist, ignoring damage"); return true; }
 
+        float oldDamage = damage;
         // Increase the damage
-        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncrease"));
+        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
+        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+
+        if (Configuration.enableExtendedLog)
+            Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
 
         #region native
         if ((!__instance.Alive || __instance.IsActivityRunning("invulnerable")) && damageSource.Type != EnumDamageType.Heal)

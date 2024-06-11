@@ -1,10 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "0rBtABDtjIZhDJ3jYccs2DrP/sDZNC/0l37IowlTACGgeKKWJf1SbX4HyaWuHaGD+3+4LwtXQvhVN0jyo5MXNg==",
+  "dgSpecHash": "Pvdlijei63KbyU22w0iTlqSLGKIV5827no47cQ+9ogd71Gh3bbUV+jZbFwpBcQiPVHgzg5R/TucfhUhvtw7BoQ==",
   "success": true,
-  "projectFilePath": "/home/bobs/User/Projects/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj",
+  "projectFilePath": "/home/bobs/Templates/RPGDifficulty/RPGDifficulty/RPGDifficulty.csproj",
   "expectedPackageFiles": [
-    "/home/bobs/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.18/microsoft.aspnetcore.app.ref.7.0.18.nupkg.sha512"
+    "/home/bobs/.nuget/packages/microsoft.aspnetcore.app.ref/7.0.20/microsoft.aspnetcore.app.ref.7.0.20.nupkg.sha512"
   ],
   "logs": []
 }
