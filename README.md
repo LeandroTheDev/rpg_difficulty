@@ -8,7 +8,7 @@ Features:
 - Damage status increase
 - Increase by distance
 - Increase by height
-- Level UP Mod Compatibility
+- [Level UP](https://mods.vintagestory.at/levelup) Mod Compatibility
 
 Future features:
 - Level UP Mod increase experience kill based on distance
