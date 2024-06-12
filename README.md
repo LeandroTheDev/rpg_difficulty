@@ -1,6 +1,10 @@
 # RPG Difficulty
 Monster and Creatures increases their status when you get away from the spawn
 
+What happens if increase by distance and height is enabled?
+
+The firs status to be changed is the entity health by the distance, after that the height will be increased, for example a entity have 10 HP the entity coordinates 100x100 this will increase 10% of entity health:
+
 Features:
 - Blacklist
 - Whitelist

@@ -3,12 +3,14 @@
     "enableBlacklist": true,
     "enableStatusIncreaseByHeight": true,
     "increaseStatsEveryDownHeight": 10,
-    "baseStatusHeight": 60,
+    "baseStatusHeight": 110,
     "lifeStatsIncreaseEveryHeight": 0.1,
     "damageStatsIncreaseEveryHeight": 0.1,
+    "lootStatsIncreaseEveryHeight": 0.1,
     "enableStatusIncreaseByDistance": true,
     "increaseStatsEveryDistance": 500,
     "lifeStatsIncreaseEveryDistance": 0.1,
     "damageStatsIncreaseEveryDistance": 0.1,
+    "lootStatsIncreaseEveryDistance": 0.1,
     "enableExtendedLog": true
 }
