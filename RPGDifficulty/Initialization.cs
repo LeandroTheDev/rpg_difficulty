@@ -17,6 +17,7 @@ public class RPGDifficultyModSystem : ModSystem
         serverAPI = api;
         // Event instaciation
         api.Event.OnEntitySpawn += IncreaseEntityStats;
+        Overwrite.isServer = true;
     }
 
     public override void Start(ICoreAPI api)
@@ -104,11 +105,9 @@ public class RPGDifficultyModSystem : ModSystem
             }
             // Changing Health Stats
             EntityBehaviorHealth entityLifeStats = entity.GetBehavior<EntityBehaviorHealth>();
+            // Check existance, for example buttlerfly doesn't have a life status
             if (entityLifeStats != null)
             {
-                if (Configuration.enableExtendedLog)
-                    Debug.Log($"{entity.Code} increasing max health in: {(int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance)) + (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight))}, damage: {Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance}");
-
                 // Increase entity max health
                 entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
                 entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
@@ -117,11 +116,18 @@ public class RPGDifficultyModSystem : ModSystem
                 // Increase entity actual health
                 entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
                 entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
+                entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseDistance", Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance);
+                entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseHeight", Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight);
+                entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseDistance", Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance);
+                entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseHeight", Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight);
+
+
+                if (Configuration.enableExtendedLog && entity.Code.ToString() == "game:bear-male-polar")
+                {
+                    Debug.Log($"{entity.EntityId}");
+                    Debug.Log($"{entity.Code} increasing max health in: {(int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance)) + (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight))} damage: {(Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight)} loot: {(Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight)}");
+                }
             }
-            entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseDistance", Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance);
-            entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseHeight", Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight);
-            entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseDistance", Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance);
-            entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseHeight", Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight);
         }
 
         // Blacklist Check
