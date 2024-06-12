@@ -18,10 +18,12 @@ public static class Configuration
     public static int baseStatusHeight = 60;
     public static double lifeStatsIncreaseEveryHeight = 0.1;
     public static double damageStatsIncreaseEveryHeight = 0.1;
+    public static double lootStatsIncreaseEveryHeight = 0.1;
     public static bool enableStatusIncreaseByDistance = true;
     public static int increaseStatsEveryDistance = 500;
     public static double lifeStatsIncreaseEveryDistance = 0.1;
     public static double damageStatsIncreaseEveryDistance = 0.1;
+    public static double lootStatsIncreaseEveryDistance = 0.1;
     public static bool enableExtendedLog = true;
 
     public static void UpdateBaseConfigurations(ICoreAPI api)
@@ -76,6 +78,13 @@ public static class Configuration
                 else damageStatsIncreaseEveryDistance = (double)value;
             else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
         }
+        { //lootStatsIncreaseEveryHeight
+            if (baseConfigs.TryGetValue("lootStatsIncreaseEveryHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryHeight is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lootStatsIncreaseEveryHeight is not double is {value.GetType()}");
+                else lootStatsIncreaseEveryHeight = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryHeight not set");
+        }
         { //enableStatusIncreaseByDistance
             if (baseConfigs.TryGetValue("enableStatusIncreaseByDistance", out object value))
                 if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByDistance is null");
@@ -103,6 +112,13 @@ public static class Configuration
                 else if (value is not double) Debug.Log($"CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is not double is {value.GetType()}");
                 else damageStatsIncreaseEveryDistance = (double)value;
             else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
+        }
+        { //lootStatsIncreaseEveryDistance
+            if (baseConfigs.TryGetValue("lootStatsIncreaseEveryDistance", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryDistance is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lootStatsIncreaseEveryDistance is not double is {value.GetType()}");
+                else lootStatsIncreaseEveryDistance = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryDistance not set");
         }
         { //enableExtendedLog
             if (baseConfigs.TryGetValue("enableExtendedLog", out object value))
@@ -140,10 +156,12 @@ public static class Configuration
         Debug.Log($"CONFIG: baseStatusHeight, value: {baseStatusHeight}");
         Debug.Log($"CONFIG: lifeStatsIncreaseEveryHeight, value: {lifeStatsIncreaseEveryHeight}");
         Debug.Log($"CONFIG: damageStatsIncreaseEveryHeight, value: {damageStatsIncreaseEveryHeight}");
+        Debug.Log($"CONFIG: lootStatsIncreaseEveryHeight, value: {lootStatsIncreaseEveryHeight}");
         Debug.Log($"CONFIG: enableStatusIncreaseByDistance, value: {enableStatusIncreaseByDistance}");
         Debug.Log($"CONFIG: increaseStatsEveryDistance, value: {increaseStatsEveryDistance}");
         Debug.Log($"CONFIG: lifeStatsIncreaseEveryDistance, value: {lifeStatsIncreaseEveryDistance}");
         Debug.Log($"CONFIG: damageStatsIncreaseEveryDistance, value: {damageStatsIncreaseEveryDistance}");
+        Debug.Log($"CONFIG: lootStatsIncreaseEveryDistance, value: {lootStatsIncreaseEveryDistance}");
         Debug.Log($"CONFIG: enableExtendedLog, value: {enableExtendedLog}");
     }
     #endregion

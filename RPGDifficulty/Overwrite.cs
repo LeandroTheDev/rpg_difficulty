@@ -85,20 +85,51 @@ class LevelUPCompatibility
         if (Configuration.enableExtendedLog)
             Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
 
-        // Add this damage at final calculation of level up
-        if (__instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"] == null)
+        // Check for compatibilities
+        if (__instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage") == 0.0)
         {
             // Simple create new stats if not exist
-            __instance.Stats.Set("LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage", "DamageFinish", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
+            __instance.Stats.Set("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", "DamageStart", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
         }
         else
         {
-            // Some other mod has already created the a finish calculation variable lets get it
-            float entityAdditionalDamage = __instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage");
+            // Some other mod has already created the compatibility, lets get the value
+            float entityAdditionalDamage = __instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage");
             // We set now the variable as the: previous additional damage from other mod plus ours new damage
-            __instance.Stats["LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage"].Set("DamageFinish", entityAdditionalDamage + (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
+            __instance.Stats.Set("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", "DamageStart", entityAdditionalDamage + (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
         }
     }
+
+    // Overwrite Knife Harvesting
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(EntityBehaviorHarvestable), "SetHarvested")]
+    public static void SetHarvestedKnifeStart(EntityBehaviorHarvestable __instance, IPlayer byPlayer, float dropQuantityMultiplier = 1f)
+    {
+        // Check if player exist and options is enabled
+        if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
+
+
+        // Get the final droprate
+        float dropRateIncrease = byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseDistance") + byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseHeight");
+
+        // Checking if not exist any compatibility yet
+        if (byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 0.0)
+        {
+            // Simple create new stats if not exist
+            byPlayer.Entity.Stats.Set("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", "HarvestStart", dropRateIncrease, true);
+        }
+        else
+        {
+            // Some other mod has already created the compatibility, lets get the value
+            float entityDropRate = byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife");
+            // We set now the variable as the: previous additional droprate from other mod plus ours new droprate
+            byPlayer.Entity.Stats.Set("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", "HarvestStart", entityDropRate + dropRateIncrease, true);
+        }
+
+        if (Configuration.enableExtendedLog)
+            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, increasing multiply by: {dropRateIncrease}");
+    }
+
 }
 
 #pragma warning disable IDE0060
@@ -190,72 +221,30 @@ class DamageInteraction
     [HarmonyPatch(typeof(EntityBehaviorHarvestable), "SetHarvested")]
     public static void SetHarvestedKnifeStart(EntityBehaviorHarvestable __instance, IPlayer byPlayer, float dropQuantityMultiplier = 1f)
     {
-        // if (!Configuration.enableLevelKnife) return;
+        // Check if player exist and options is enabled
+        if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
 
-        // // Receive the droprate from other mods
-        // float compatibilityDroprate = byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife");
+        float oldDropRate = byPlayer.Entity.Stats.GetBlended("animalLootDropRate");
 
-        // // Check if is from the server
-        // if (byPlayer is IServerPlayer && __instance.entity.World.Side == EnumAppSide.Server)
-        // {
-        //     IServerPlayer player = byPlayer as IServerPlayer;
-        //     // Earny xp by harvesting entity
-        //     instance.serverAPI?.OnClientMessage(player, "Knife_Harvest_Entity");
+        // Store the old drop rate
+        byPlayer.Entity.Stats.Set("old_animalLootDropRate", "old_animalLootDropRate", oldDropRate);
 
-        //     // Store the old drop rate
-        //     player.Entity.Stats.Set("old_animalLootDropRate", "old_animalLootDropRate", player.Entity.Stats.GetBlended("animalLootDropRate"));
+        // Get the final droprate
+        float dropRate = oldDropRate + byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseDistance") + byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseHeight");
 
-        //     // Get the final droprate
-        //     float dropRate = Configuration.KnifeGetHarvestMultiplyByLevel(player.Entity.WatchedAttributes.GetInt("LevelUP_Level_Knife")) + compatibilityDroprate;
-
-        //     // Increasing entity drop rate
-        //     player.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate);
-        //     if (Configuration.enableExtendedLog)
-        //         Debug.Log($"{player.PlayerName} harvested any entity with knife, multiply drop: {dropRate}");
-        // }
-        // // Single player treatment and lan treatment
-        // else if (instance.clientAPI != null && instance.clientAPI.api.IsSinglePlayer)
-        // {
-        //     instance.clientAPI.channel.SendPacket($"Knife_Harvest_Entity&lanplayername={byPlayer.PlayerName}");
-
-        //     // Store the old drop rate
-        //     byPlayer.Entity.Stats.Set("old_animalLootDropRate", "old_animalLootDropRate", byPlayer.Entity.Stats.GetBlended("animalLootDropRate"));
-
-        //     // Get the final droprate
-        //     float dropRate = Configuration.KnifeGetHarvestMultiplyByLevel(byPlayer.Entity.WatchedAttributes.GetInt("LevelUP_Level_Knife")) + compatibilityDroprate;
-
-        //     // Increasing entity drop rate
-        //     byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate);
-        //     if (Configuration.enableExtendedLog)
-        //         Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate}");
-        // }
+        // Increasing entity drop rate
+        byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate);
+        if (Configuration.enableExtendedLog)
+            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate}");
     }
     // Overwrite Knife Harvesting
     [HarmonyPostfix]
     [HarmonyPatch(typeof(EntityBehaviorHarvestable), "SetHarvested")]
     public static void SetHarvestedKnifeFinish(EntityBehaviorHarvestable __instance, IPlayer byPlayer, float dropQuantityMultiplier = 1f)
     {
-        // if (!Configuration.enableLevelKnife || byPlayer == null) return;
-
-        // // Check if the old drop rate exist
-        // if (byPlayer.Entity.Stats.GetBlended("old_animalLootDropRate") == 0.0f) return;
-
-        // // Check if is from the server
-        // if (byPlayer is IServerPlayer && __instance.entity.World.Side == EnumAppSide.Server)
-        // {
-        //     IServerPlayer player = byPlayer as IServerPlayer;
-
-        //     // Reload old drop rate
-        //     player.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", player.Entity.Stats.GetBlended("old_animalLootDropRate"));
-        // }
-        // // Singleplayer/Lan compatibility
-        // else if (instance.clientAPI != null && instance.clientAPI.api.IsSinglePlayer)
-        // {
-        //     byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", byPlayer.Entity.Stats.GetBlended("old_animalLootDropRate"));
-        // }
-
-        // byPlayer.Entity.Stats.Remove("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", "HarvestStart");
-
+        // Return to old drop rate if necessary
+        if (byPlayer != null && byPlayer.Entity.Stats.GetBlended("old_animalLootDropRate") != 0.0f)
+            byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", byPlayer.Entity.Stats.GetBlended("old_animalLootDropRate"));
     }
     #endregion
 }
