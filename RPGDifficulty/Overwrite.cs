@@ -32,7 +32,6 @@ class Overwrite
         }
         else
         {
-            Debug.Log("Level UP Mod not been detected");
             if (!Harmony.HasAnyPatches("rpgdifficulty_damage_standalone"))
             {
                 overwriter = new Harmony("rpgdifficulty_damage_standalone");
@@ -86,7 +85,7 @@ class LevelUPCompatibility
             Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
 
         // Check for compatibilities
-        if (__instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage") == 0.0)
+        if (__instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage") == 0.0f)
         {
             // Simple create new stats if not exist
             __instance.Stats.Set("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", "DamageStart", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
@@ -113,7 +112,7 @@ class LevelUPCompatibility
         float dropRateIncrease = byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseDistance") + byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseHeight");
 
         // Checking if not exist any compatibility yet
-        if (byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 0.0)
+        if (byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 0.0f)
         {
             // Simple create new stats if not exist
             byPlayer.Entity.Stats.Set("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", "HarvestStart", dropRateIncrease, true);
