@@ -48,12 +48,6 @@
         <Private>false</Private>
     </Reference>
   </ItemGroup>
-   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-        <HintPath>$(VINTAGE_STORY)/Mods/LevelUP/LevelUP.dll.dll</HintPath>
-        <Private>false</Private>
-    </Reference>
-  </ItemGroup>
 
 <ItemGroup>
   <Content Include="assets\**">
