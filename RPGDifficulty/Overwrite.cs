@@ -4,7 +4,9 @@ using LevelUP;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
+using Vintagestory.API.Server;
 using Vintagestory.API.Util;
+using Vintagestory.Client.NoObf;
 using Vintagestory.GameContent;
 
 namespace RPGDifficulty;
@@ -12,6 +14,7 @@ class Overwrite
 {
     static bool levelUPCompatibility = false;
     public Harmony overwriter;
+    static public bool isServer = false;
     public void OverwriteNativeFunctions(ICoreAPI api)
     {
         // Level UP Compatibility
@@ -107,12 +110,11 @@ class LevelUPCompatibility
         // Check if player exist and options is enabled
         if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
 
-
         // Get the final droprate
-        float dropRateIncrease = byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseDistance") + byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseHeight");
+        float dropRateIncrease = (float)(__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + __instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight"));
 
         // Checking if not exist any compatibility yet
-        if (byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 0.0f)
+        if (byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 1f)
         {
             // Simple create new stats if not exist
             byPlayer.Entity.Stats.Set("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", "HarvestStart", dropRateIncrease, true);
@@ -126,7 +128,7 @@ class LevelUPCompatibility
         }
 
         if (Configuration.enableExtendedLog)
-            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, increasing multiply by: {dropRateIncrease}");
+            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, increasing multiply by: {dropRateIncrease} from: {Overwrite.isServer}");
     }
 
 }
@@ -229,7 +231,7 @@ class DamageInteraction
         byPlayer.Entity.Stats.Set("old_animalLootDropRate", "old_animalLootDropRate", oldDropRate);
 
         // Get the final droprate
-        float dropRate = oldDropRate + byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseDistance") + byPlayer.Entity.Stats.GetBlended("RPGDifficultyLootStatsIncreaseHeight");
+        float dropRate = oldDropRate + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
 
         // Increasing entity drop rate
         byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate);

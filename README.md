@@ -31,6 +31,8 @@ By default the blacklist with "game:player" is enabled, because of course we don
 
 Theres no way to performances leaks on the server because the RPG Difficulty only change 1 native function (ReceiveDamage) and a simple event when entity spawn.
 
+Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus
+
 ### About RPG Difficulty
 RPG Difficulty is open source project and can easily be accessed on the github, all contents from this mod is completly free.
 
