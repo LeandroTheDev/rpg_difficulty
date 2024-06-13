@@ -6,7 +6,7 @@
         "BoboDev"
     ],
     "description": "Increase entities stats based on world distance",
-    "version": "1.0.2",
+    "version": "1.0.2-rc.2",
     "dependencies": {
         "game": ""
     }
