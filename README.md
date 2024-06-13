@@ -12,6 +12,7 @@ Features:
 - Whitelist
 - Life status increase
 - Damage status increase
+- Loot drop increase
 - Increase by distance
 - Increase by height
 - [Level UP](https://mods.vintagestory.at/levelup) Mod Compatibility
