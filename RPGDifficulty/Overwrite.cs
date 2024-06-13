@@ -12,7 +12,7 @@ using Vintagestory.GameContent;
 namespace RPGDifficulty;
 class Overwrite
 {
-    static bool levelUPCompatibility = false;
+    public bool levelUPCompatibility = false;
     public Harmony overwriter;
     public void OverwriteNativeFunctions(ICoreAPI api)
     {

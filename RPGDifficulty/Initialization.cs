@@ -17,6 +17,74 @@ public class RPGDifficultyModSystem : ModSystem
         serverAPI = api;
         // Event instaciation
         api.Event.OnEntitySpawn += IncreaseEntityStats;
+        // Create the timer only with levelup compatibility
+        if (overwriter.levelUPCompatibility && Configuration.levelUPExperienceIncreaseEveryDistance != 0.0 && Configuration.levelUPExperienceIncreaseEveryHeight != 0.0)
+        {
+            Debug.Log("Experience mechanic enabled, initializing LevelUP Compatibility");
+            api.Event.Timer(OnTimerElapsed, 1000);
+            api.Event.PlayerDisconnect += PlayerDisconnected;
+        }
+    }
+
+    private void PlayerDisconnected(IServerPlayer player)
+    {
+        player.Entity.Attributes.RemoveAttribute("LevelUP_Server_Instance_ExperienceMultiplier_IncreaseExp");
+    }
+
+    private void OnTimerElapsed()
+    {
+        foreach (IPlayer player in serverAPI.World.AllOnlinePlayers)
+        {
+            int statsIncreaseDistance = 0;
+            int statsIncreaseHeight = 0;
+            // Stats increasing
+            {
+                // Coordinates
+                double entityX = player.Entity.Pos.X - serverAPI.World.DefaultSpawnPosition.X;
+                double entityZ = player.Entity.Pos.Z - serverAPI.World.DefaultSpawnPosition.Z;
+                double entityY = player.Entity.Pos.Y;
+
+                // XZ Coordinates translations
+                if (entityX < 0) entityX = Math.Abs(entityX);
+                if (entityZ < 0) entityZ = Math.Abs(entityZ);
+
+                // Distance calculation
+                if (Configuration.enableStatusIncreaseByDistance)
+                {
+                    while (true)
+                    {
+                        if (entityX <= Configuration.increaseStatsEveryDistance && entityZ <= Configuration.increaseStatsEveryDistance) break;
+
+                        // Reduce X
+                        if (entityX > Configuration.increaseStatsEveryDistance)
+                        {
+                            entityX -= Configuration.increaseStatsEveryDistance;
+                            statsIncreaseDistance++;
+                        }
+                        // Reduce Z
+                        if (entityZ > Configuration.increaseStatsEveryDistance)
+                        {
+                            entityZ -= Configuration.increaseStatsEveryDistance;
+                            statsIncreaseDistance++;
+                        }
+                    }
+                }
+
+                // Height Calculation
+                if (Configuration.enableStatusIncreaseByHeight)
+                {
+                    while (true)
+                    {
+                        if (entityY >= Configuration.baseStatusHeight || (entityY + Configuration.increaseStatsEveryDownHeight) >= Configuration.baseStatusHeight) break;
+
+                        entityY += Configuration.increaseStatsEveryDownHeight;
+                        statsIncreaseHeight++;
+                    }
+                }
+            }
+            // Set global experience for LevelUP compatibility layer
+            player.Entity.Attributes.SetFloat("LevelUP_Server_Instance_ExperienceMultiplier_IncreaseExp", (float)((Configuration.levelUPExperienceIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.levelUPExperienceIncreaseEveryHeight * statsIncreaseHeight)));
+        }
     }
 
     public override void Start(ICoreAPI api)
