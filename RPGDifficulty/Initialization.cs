@@ -21,7 +21,8 @@ public class RPGDifficultyModSystem : ModSystem
         if (overwriter.levelUPCompatibility && Configuration.levelUPExperienceIncreaseEveryDistance != 0.0 && Configuration.levelUPExperienceIncreaseEveryHeight != 0.0)
         {
             Debug.Log("Experience mechanic enabled, initializing LevelUP Compatibility");
-            api.Event.Timer(OnTimerElapsed, 1000);
+            api.Event.Timer(OnTimerElapsed, Configuration.levelUPSecondsPositionUpdate);
+            Debug.Log($"Updating player experience multiplier every {Configuration.levelUPSecondsPositionUpdate} second");
             api.Event.PlayerDisconnect += PlayerDisconnected;
         }
     }
@@ -176,6 +177,7 @@ public class RPGDifficultyModSystem : ModSystem
             if (entityLifeStats != null)
             {
                 // Increase entity max health
+                float oldBaseMaxHealth = entityLifeStats.BaseMaxHealth; // Debugging porpuses
                 entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
                 entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
                 entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
@@ -190,10 +192,7 @@ public class RPGDifficultyModSystem : ModSystem
 
 
                 if (Configuration.enableExtendedLog)
-                {
-                    Debug.Log($"{entity.EntityId}");
-                    Debug.Log($"{entity.Code} increasing max health in: {entityLifeStats.BaseMaxHealth} damage percentage: {(Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight)} loot percentage: {(Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight)}");
-                }
+                    Debug.Log($"{entity.Code} increasing max health in: {entityLifeStats.BaseMaxHealth - oldBaseMaxHealth} damage percentage: {(Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight)} loot percentage: {(Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight)}");
             }
         }
 

@@ -13,6 +13,7 @@
     "lifeStatsIncreaseEveryDistance": 0.1,
     "damageStatsIncreaseEveryDistance": 0.1,
     "lootStatsIncreaseEveryDistance": 0.1,
-    "levelUPExperienceIncreaseEveryDistance": 0.1,
+    "levelUPExperienceIncreaseEveryDistance": 1.0,
+    "levelUPSecondsPositionUpdate": 5,
     "enableExtendedLog": true
 }

@@ -26,6 +26,7 @@ public static class Configuration
     public static double damageStatsIncreaseEveryDistance = 0.1;
     public static double lootStatsIncreaseEveryDistance = 0.1;
     public static double levelUPExperienceIncreaseEveryDistance = 0.1;
+    public static int levelUPSecondsPositionUpdate = 1000;
     public static bool enableExtendedLog = true;
 
     public static void UpdateBaseConfigurations(ICoreAPI api)
@@ -135,6 +136,13 @@ public static class Configuration
                 else if (value is not double) Debug.Log($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance is not double is {value.GetType()}");
                 else levelUPExperienceIncreaseEveryDistance = (double)value;
             else Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance not set");
+        }
+        { //levelUPSecondsPositionUpdate
+            if (baseConfigs.TryGetValue("levelUPSecondsPositionUpdate", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPSecondsPositionUpdate is null");
+                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: levelUPSecondsPositionUpdate is not int is {value.GetType()}");
+                else levelUPSecondsPositionUpdate = (int)(long)value;
+            else Debug.Log("CONFIGURATION ERROR: levelUPSecondsPositionUpdate not set");
         }
         { //enableExtendedLog
             if (baseConfigs.TryGetValue("enableExtendedLog", out object value))
