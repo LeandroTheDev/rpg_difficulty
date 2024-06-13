@@ -121,10 +121,10 @@ public class RPGDifficultyModSystem : ModSystem
                 entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseHeight", Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight);
 
 
-                if (Configuration.enableExtendedLog && entity.Code.ToString() == "game:bear-male-polar")
+                if (Configuration.enableExtendedLog)
                 {
                     Debug.Log($"{entity.EntityId}");
-                    Debug.Log($"{entity.Code} increasing max health in: {(int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance)) + (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight))} damage: {(Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight)} loot: {(Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight)}");
+                    Debug.Log($"{entity.Code} increasing max health in: {entityLifeStats.BaseMaxHealth} damage percentage: {(Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight)} loot percentage: {(Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight)}");
                 }
             }
         }
