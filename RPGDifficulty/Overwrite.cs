@@ -14,7 +14,6 @@ class Overwrite
 {
     static bool levelUPCompatibility = false;
     public Harmony overwriter;
-    static public bool isServer = false;
     public void OverwriteNativeFunctions(ICoreAPI api)
     {
         // Level UP Compatibility
@@ -88,17 +87,17 @@ class LevelUPCompatibility
             Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
 
         // Check for compatibilities
-        if (__instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage") == 0.0f)
+        if (__instance.Attributes.GetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage") == 0.0f)
         {
             // Simple create new stats if not exist
-            __instance.Stats.Set("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", "DamageStart", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
+            __instance.Attributes.SetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")));
         }
         else
         {
             // Some other mod has already created the compatibility, lets get the value
-            float entityAdditionalDamage = __instance.Stats.GetBlended("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage");
+            float entityAdditionalDamage = __instance.Attributes.GetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage");
             // We set now the variable as the: previous additional damage from other mod plus ours new damage
-            __instance.Stats.Set("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", "DamageStart", entityAdditionalDamage + (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")), true);
+            __instance.Attributes.SetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", entityAdditionalDamage + (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")));
         }
     }
 
@@ -114,21 +113,21 @@ class LevelUPCompatibility
         float dropRateIncrease = (float)(__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + __instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight"));
 
         // Checking if not exist any compatibility yet
-        if (byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 1f)
+        if (byPlayer.Entity.Attributes.GetFloat("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 0f)
         {
             // Simple create new stats if not exist
-            byPlayer.Entity.Stats.Set("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", "HarvestStart", dropRateIncrease, true);
+            byPlayer.Entity.Attributes.SetFloat("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", dropRateIncrease);
         }
         else
         {
             // Some other mod has already created the compatibility, lets get the value
-            float entityDropRate = byPlayer.Entity.Stats.GetBlended("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife");
+            float entityDropRate = byPlayer.Entity.Attributes.GetFloat("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife");
             // We set now the variable as the: previous additional droprate from other mod plus ours new droprate
-            byPlayer.Entity.Stats.Set("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", "HarvestStart", entityDropRate + dropRateIncrease, true);
+            byPlayer.Entity.Attributes.SetFloat("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife", entityDropRate + dropRateIncrease);
         }
 
         if (Configuration.enableExtendedLog)
-            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, increasing multiply by: {dropRateIncrease} from: {Overwrite.isServer}");
+            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, increasing multiply by: {dropRateIncrease}");
     }
 
 }

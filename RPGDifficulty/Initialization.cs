@@ -17,14 +17,13 @@ public class RPGDifficultyModSystem : ModSystem
         serverAPI = api;
         // Event instaciation
         api.Event.OnEntitySpawn += IncreaseEntityStats;
-        Overwrite.isServer = true;
     }
 
     public override void Start(ICoreAPI api)
     {
         base.Start(api);
         Debug.LoadLogger(api.Logger);
-        Debug.Log("Running on Version: 1.0.1");
+        Debug.Log($"Running on Version: {Mod.Info.Version}");
 
         // Overwrite native functions
         overwriter.OverwriteNativeFunctions(api);
