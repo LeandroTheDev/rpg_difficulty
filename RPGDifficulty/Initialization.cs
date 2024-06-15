@@ -16,7 +16,13 @@ public class RPGDifficultyModSystem : ModSystem
         base.StartServerSide(api);
         serverAPI = api;
         // Event instaciation
-        api.Event.OnEntitySpawn += IncreaseEntityStats;
+        // api.Event.OnEntitySpawn += IncreaseEntityStats;
+        // SpawnersAPI Compatibility
+        if (api.ModLoader.IsModEnabled("spawnersapi"))
+        {
+            Debug.Log("SpawnersAPI detected creating event for OnSpawnerSpawn");
+            SpawnersAPI.Spawner.OnSpawnerSpawn += IncreaseEntityStats;
+        }
         // Create the timer only with levelup compatibility
         if (overwriter.levelUPCompatibility && Configuration.levelUPExperienceIncreaseEveryDistance != 0.0 && Configuration.levelUPExperienceIncreaseEveryHeight != 0.0)
         {
@@ -171,6 +177,8 @@ public class RPGDifficultyModSystem : ModSystem
                     }
                 }
             }
+            // Single player / Lan treatment
+            if (entity.SidedProperties == null) return;
             // Changing Health Stats
             EntityBehaviorHealth entityLifeStats = entity.GetBehavior<EntityBehaviorHealth>();
             // Check existance, for example buttlerfly doesn't have a life status

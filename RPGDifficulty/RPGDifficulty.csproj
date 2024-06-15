@@ -36,6 +36,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="SpawnersAPI">
+      <HintPath>$(VINTAGE_STORY)/Mods/SpawnersAPI/SpawnersAPI.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>$(VINTAGE_STORY)/Lib/0Harmony.dll</HintPath>
       <Private>false</Private>
