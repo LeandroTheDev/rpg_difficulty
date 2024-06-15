@@ -17,12 +17,6 @@ public class RPGDifficultyModSystem : ModSystem
         serverAPI = api;
         // Event instaciation
         api.Event.OnEntitySpawn += IncreaseEntityStats;
-        // SpawnersAPI Compatibility
-        if (api.ModLoader.IsModEnabled("spawnersapi"))
-        {
-            Debug.Log("SpawnersAPI detected creating event for OnSpawnerSpawn");
-            SpawnersAPI.Spawner.OnSpawnerSpawn += IncreaseEntityStats;
-        }
         // Create the timer only with levelup compatibility
         if (overwriter.levelUPCompatibility && Configuration.levelUPExperienceIncreaseEveryDistance != 0.0 && Configuration.levelUPExperienceIncreaseEveryHeight != 0.0)
         {
