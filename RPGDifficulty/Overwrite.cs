@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using LevelUP;
 using Vintagestory.API.Common;
@@ -58,46 +59,37 @@ class LevelUPCompatibility
     public static void ReceiveDamage(Entity __instance, DamageSource damageSource, float damage)
     {
         if (damageSource.SourceEntity == null || damageSource.GetCauseEntity() == null) return;
-
-        EntityAgent entityDamaged;
+        // Getting the entity that does the damage
+        EntityAgent entityDamageSource;
         if (damageSource.GetCauseEntity() is EntityAgent)
-            entityDamaged = damageSource.GetCauseEntity() as EntityAgent;
+            entityDamageSource = damageSource.GetCauseEntity() as EntityAgent;
         else if (damageSource.SourceEntity is EntityAgent)
-            entityDamaged = damageSource.SourceEntity as EntityAgent;
+            entityDamageSource = damageSource.SourceEntity as EntityAgent;
         else return;
-
-        // Blacklist Check
-        if (Configuration.enableBlacklist)
-            if (Configuration.blacklist.TryGetValue(entityDamaged.Code.ToString(), out double _))
-            { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is on blacklist, ignoring damage"); return; }
-        // Whitelist Check
-        if (Configuration.enableWhitelist)
-            // In whitelist
-            if (Configuration.whitelist.TryGetValue(entityDamaged.Code.ToString(), out double _))
-            { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is on whitelist, increasing damage"); }
-            // Not in whitelist
-            else { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is not on whitelist, ignoring damage"); return; }
 
         float oldDamage = damage;
         // Increase the damage
-        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
-        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+        damage += (float)(damage * entityDamageSource.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
+        damage += (float)(damage * entityDamageSource.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+
+        // Empty status just continue
+        if (damage - oldDamage == 0f) return;
 
         if (Configuration.enableExtendedLog)
-            Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
+            Debug.Log($"{entityDamageSource.Code} damage increased by {damage - oldDamage}");
 
         // Check for compatibilities
-        if (__instance.Attributes.GetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage") == 0.0f)
+        if (__instance.Attributes.GetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage") == 0.0f)
         {
             // Simple create new stats if not exist
-            __instance.Attributes.SetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")));
+            __instance.Attributes.SetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage", damage - oldDamage);
         }
         else
         {
             // Some other mod has already created the compatibility, lets get the value
-            float entityAdditionalDamage = __instance.Attributes.GetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage");
+            float entityAdditionalDamage = __instance.Attributes.GetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage");
             // We set now the variable as the: previous additional damage from other mod plus ours new damage
-            __instance.Attributes.SetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageStart_ReceiveDamage", entityAdditionalDamage + (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance")));
+            __instance.Attributes.SetFloat("LevelUP_DamageInteraction_Compatibility_ExtendDamageFinish_ReceiveDamage", entityAdditionalDamage + (damage - oldDamage));
         }
     }
 
@@ -143,7 +135,7 @@ class DamageInteraction
     public static bool ReceiveDamage(Entity __instance, DamageSource damageSource, float damage)
     {
         if (damageSource.SourceEntity == null || damageSource.GetCauseEntity() == null) return true;
-
+        // Getting the entity that does the damage
         EntityAgent entityDamaged;
         if (damageSource.GetCauseEntity() is EntityAgent)
             entityDamaged = damageSource.GetCauseEntity() as EntityAgent;
@@ -165,8 +157,8 @@ class DamageInteraction
 
         float oldDamage = damage;
         // Increase the damage
-        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
-        damage += (float)(damage * __instance.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+        damage += (float)(damage * entityDamaged.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
+        damage += (float)(damage * entityDamaged.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
 
         if (Configuration.enableExtendedLog)
             Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
