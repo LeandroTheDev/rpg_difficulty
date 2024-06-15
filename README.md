@@ -1,12 +1,6 @@
 # RPG Difficulty
 Monster and Creatures increases their status when you get away from the spawn
 
-What happens if increase by distance and height is enabled?
-
-The first status to be changed is the entity health by the distance, after that the height status health will be increased, for example a entity have 10 HP by default -> 100% increase by distance -> 20 HP -> 100% increase by height -> 40 HP, the same works for damage.
-
-Because the loot is already a percentage, the difference in height and distance will just be a sum between this two, for example a default loot drop have 0.5 -> 0.5 increased by distanced -> 1.0 -> 0.5 increased by height -> 1.5.
-
 Features:
 - Blacklist
 - Whitelist
@@ -16,6 +10,9 @@ Features:
 - Increase by distance
 - Increase by height
 - [Level UP](https://mods.vintagestory.at/levelup) Mod Compatibility
+- [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience kill based on distance
+- [Spawners API](https://github.com/LeandroTheDev/spawners_api) Mod Compatibility
+- [Spawners API](https://github.com/LeandroTheDev/spawners_api) Mod increase enemy status on spawners depending on distance/height of spawner position
 
 Future features:
 - Level UP Mod increase experience kill based on distance
