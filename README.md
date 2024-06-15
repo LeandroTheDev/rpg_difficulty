@@ -31,6 +31,8 @@ By default the blacklist with "game:player" is enabled, because of course we don
 
 Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity spawn in the world, but of course only if entity has a health status, if the entity doesn't have a health status is ignored by the mod, like anything that move and is not alive.
 
+The configuration enableExtended logs can cause performances problems, because a lot of things in the mod is logged out, if the mod is very stable in your world/modpack please consider desabling it in configurations
+
 ### About RPG Difficulty
 RPG Difficulty is open source project and can easily be accessed on the github, all contents from this mod is completly free.
 
