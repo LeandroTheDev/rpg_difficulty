@@ -16,7 +16,7 @@ public class RPGDifficultyModSystem : ModSystem
         base.StartServerSide(api);
         serverAPI = api;
         // Event instaciation
-        // api.Event.OnEntitySpawn += IncreaseEntityStats;
+        api.Event.OnEntitySpawn += IncreaseEntityStats;
         // SpawnersAPI Compatibility
         if (api.ModLoader.IsModEnabled("spawnersapi"))
         {
