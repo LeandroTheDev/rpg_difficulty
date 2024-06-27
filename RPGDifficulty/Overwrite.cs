@@ -216,27 +216,13 @@ class DamageInteraction
         // Check if player exist and options is enabled
         if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
 
-        float oldDropRate = byPlayer.Entity.Stats.GetBlended("animalLootDropRate");
-
-        // Store the old drop rate
-        byPlayer.Entity.Stats.Set("old_animalLootDropRate", "old_animalLootDropRate", oldDropRate);
-
         // Get the final droprate
-        float dropRate = oldDropRate + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
+        float dropRate = (float)Configuration.baseHarvest + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
 
         // Increasing entity drop rate
         byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate);
         if (Configuration.enableExtendedLog)
-            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate}");
-    }
-    // Overwrite Knife Harvesting
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(EntityBehaviorHarvestable), "SetHarvested")]
-    public static void SetHarvestedKnifeFinish(EntityBehaviorHarvestable __instance, IPlayer byPlayer, float dropQuantityMultiplier = 1f)
-    {
-        // Return to old drop rate if necessary
-        if (byPlayer != null && byPlayer.Entity.Stats.GetBlended("old_animalLootDropRate") != 0.0f)
-            byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", byPlayer.Entity.Stats.GetBlended("old_animalLootDropRate"));
+            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
     }
     #endregion
 }

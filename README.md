@@ -1,5 +1,5 @@
 # RPG Difficulty
-Monster and Creatures increases their status when you get away from the spawn
+Monster and Creatures increases their status when you get away from the spawn or when you get deeper in the caves
 
 Features:
 - Blacklist
@@ -11,8 +11,6 @@ Features:
 - Increase by height
 - [Level UP](https://mods.vintagestory.at/levelup) Mod Compatibility
 - [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience kill based on distance
-- [Spawners API](https://github.com/LeandroTheDev/spawners_api) Mod Compatibility
-- [Spawners API](https://github.com/LeandroTheDev/spawners_api) Mod increase enemy status on spawners depending on distance/height of spawner position
 
 Future features:
 - Level UP Mod increase experience kill based on distance
@@ -22,16 +20,20 @@ RPG Difficulty simple changes the base max health when new entity spawn
 
 For the damage system to work correctly it is necessary to change the native function "ReceiveDamage", so mods that change the damage function will not work with RPG Difficulty
 
-Make a backup of the world before adding this mod, any error can drastically increase the life of a creature which can ruin your gameplay
+For the harvest system to work correctly it is neccessary to modify the native function "SetHarvested", this just creates a simple prefix to change the player "animalLootDropRate" status, and probably is compatibile with everthing.
+
+Make a backup of the world before adding this mod, any error can drastically increase the life of a creature which can ruin your gameplay.
+
+This mods changes the "animalLootDropRate", this can cause problems if you are removing the mod, if you are using the [Level UP](https://mods.vintagestory.at/levelup) theres a special section for that, if not consider harvesting any entity in the world spawn X:0 Y:110 Z:0 to reset the player status before removing the mod.
 
 ### Considerations
 This mod changes some native functions and can break easily throught updates.
 
 By default the blacklist with "game:player" is enabled, because of course we dont wanna get the players to receive the buffs from distance when entering in the server, but if you want feel free to remove it.
 
-Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity spawn in the world, but of course only if entity has a health status, if the entity doesn't have a health status is ignored by the mod, like anything that move and is not alive.
+Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity spawn in the world, but of course only if entity has a health status, if the entity doesn't have a health status is ignored by the mod, like anything that move and is not alive (arrows,  rocks, buttlerfly (yeah buttlerfly doesn't have health)).
 
-The configuration enableExtended logs can cause performances problems, because a lot of things in the mod is logged out, if the mod is very stable in your world/modpack please consider desabling it in configurations
+The configuration enableExtended logs can cause performances problems, because a lot of things in the mod is constantly logging, if the mod is very stable in your world/modpack please consider desabling it in configurations
 
 ### About RPG Difficulty
 RPG Difficulty is open source project and can easily be accessed on the github, all contents from this mod is completly free.

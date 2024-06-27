@@ -4,6 +4,7 @@
     "enableStatusIncreaseByHeight": true,
     "increaseStatsEveryDownHeight": 10,
     "baseStatusHeight": 110,
+    "baseHarvest": 0.5,
     "lifeStatsIncreaseEveryHeight": 0.1,
     "damageStatsIncreaseEveryHeight": 0.1,
     "lootStatsIncreaseEveryHeight": 0.1,
