@@ -17,6 +17,7 @@ public static class Configuration
     public static int increaseStatsEveryDownHeight = 10;
     public static int baseStatusHeight = 60;
     public static double lifeStatsIncreaseEveryHeight = 0.1;
+    public static double baseHarvest = 0.5;
     public static double damageStatsIncreaseEveryHeight = 0.1;
     public static double lootStatsIncreaseEveryHeight = 0.1;
     public static double levelUPExperienceIncreaseEveryHeight = 0.1;
@@ -73,6 +74,13 @@ public static class Configuration
                 else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight is not double is {value.GetType()}");
                 else lifeStatsIncreaseEveryHeight = (double)value;
             else Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight not set");
+        }
+        { //baseHarvest
+            if (baseConfigs.TryGetValue("baseHarvest", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: baseHarvest is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: baseHarvest is not double is {value.GetType()}");
+                else baseHarvest = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: baseHarvest not set");
         }
         { //damageStatsIncreaseEveryDistance
             if (baseConfigs.TryGetValue("damageStatsIncreaseEveryDistance", out object value))
