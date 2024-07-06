@@ -223,7 +223,7 @@ public class Debug
     static public void Log(string message)
     {
         // Check if is linux or other based system and if the terminal is active for the logs to be show
-        if ((system.Platform == PlatformID.Unix || system.Platform == PlatformID.Other) && Environment.UserInteractive)
+        if (system.Platform == PlatformID.Unix || system.Platform == PlatformID.Other || Environment.UserInteractive)
             // Based terminal users
             Console.WriteLine($"{DateTime.Now:d.M.yyyy HH:mm:ss} [RPGDifficulty] {message}");
         else

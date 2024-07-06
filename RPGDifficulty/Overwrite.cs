@@ -1,13 +1,10 @@
 using System;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
 using LevelUP;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.MathTools;
-using Vintagestory.API.Server;
 using Vintagestory.API.Util;
-using Vintagestory.Client.NoObf;
 using Vintagestory.GameContent;
 
 namespace RPGDifficulty;
@@ -217,7 +214,7 @@ class DamageInteraction
         if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
 
         // Get the final droprate
-        float dropRate = (float)Configuration.baseHarvest + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
+        float dropRate = (float)Configuration.baseHarvest + (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
 
         // Increasing entity drop rate
         byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate);
