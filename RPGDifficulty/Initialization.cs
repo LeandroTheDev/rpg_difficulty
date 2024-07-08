@@ -121,11 +121,16 @@ public class RPGDifficultyModSystem : ModSystem
         // Ignore non creature
         if (!entity.IsCreature) return;
 
+        bool increaseByDistance = Configuration.BlackWhiteListCheckForDistance(entity.Code.ToString());
+        bool increaseByHeight = Configuration.BlackWhiteListCheckForHeight(entity.Code.ToString());
+        bool increaseByAge = Configuration.BlackWhiteListCheckForAge(entity.Code.ToString());
+
         // Function for increasing entity stats
         void increaseStats()
         {
             int statsIncreaseDistance = 0;
             int statsIncreaseHeight = 0;
+            int statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
             // Stats increasing
             {
                 // Coordinates
@@ -180,17 +185,38 @@ public class RPGDifficultyModSystem : ModSystem
             {
                 // Increase entity max health
                 float oldBaseMaxHealth = entityLifeStats.BaseMaxHealth; // Debugging porpuses
-                entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
-                entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
-                entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
-                entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
+                if (increaseByDistance)
+                    entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
+                if (increaseByHeight)
+                    entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
+                if (increaseByAge)
+                    entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * (Configuration.lifeStatsIncreaseEveryAge * statsIncreaseAge));
+                if (increaseByDistance)
+                    entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
+                if (increaseByHeight)
+                    entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
+                if (increaseByAge)
+                    entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * (Configuration.lifeStatsIncreaseEveryAge * statsIncreaseAge));
                 // Increase entity actual health
-                entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
-                entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
-                entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseDistance", Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance);
-                entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseHeight", Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight);
-                entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseDistance", Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance);
-                entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseHeight", Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight);
+                if (increaseByDistance)
+                    entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryDistance * statsIncreaseDistance));
+                if (increaseByHeight)
+                    entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryHeight * statsIncreaseHeight));
+                if (increaseByAge)
+                    entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * (Configuration.lifeStatsIncreaseEveryAge * statsIncreaseAge));
+
+                if (increaseByDistance)
+                    entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseDistance", Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance);
+                if (increaseByHeight)
+                    entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseHeight", Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight);
+                if (increaseByAge)
+                    entity.Attributes.SetDouble("RPGDifficultyDamageStatsIncreaseAge", Configuration.damageStatsIncreaseEveryAge * statsIncreaseAge);
+                if (increaseByDistance)
+                    entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseDistance", Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance);
+                if (increaseByHeight)
+                    entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseHeight", Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight);
+                if (increaseByAge)
+                    entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseAge", Configuration.lootStatsIncreaseEveryAge * statsIncreaseAge);
 
 
                 if (Configuration.enableExtendedLog)
@@ -198,19 +224,9 @@ public class RPGDifficultyModSystem : ModSystem
             }
         }
 
-        // Blacklist Check
-        if (Configuration.enableBlacklist)
-            if (Configuration.blacklist.TryGetValue(entity.Code.ToString(), out double _))
-            { if (Configuration.enableExtendedLog) Debug.Log($"{entity.Code} is on blacklist, ignoring stats"); return; }
-        // Whitelist Check
-        if (Configuration.enableWhitelist)
-            // In whitelist
-            if (Configuration.whitelist.TryGetValue(entity.Code.ToString(), out double _))
-            { if (Configuration.enableExtendedLog) Debug.Log($"{entity.Code} is on whitelist, increasing stats"); increaseStats(); }
-            // Not in whitelist
-            else { if (Configuration.enableExtendedLog) Debug.Log($"{entity.Code} is not on whitelist, ignoring stats"); return; }
-        // No whitelist check and entity not blacklisted
-        else increaseStats();
+        // List Check
+        if (increaseByDistance || increaseByHeight || increaseByAge)
+            increaseStats();
     }
 }
 

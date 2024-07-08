@@ -1,5 +1,5 @@
 # RPG Difficulty
-Monster and Creatures increases their status when you get away from the spawn or when you get deeper in the caves
+Monster and Creatures increases their status getting away from the spawn, getting deeper in the caves and by the world aging, highly configurable
 
 Features:
 - Blacklist
@@ -9,11 +9,8 @@ Features:
 - Loot drop increase
 - Increase by distance
 - Increase by height
-- [Level UP](https://mods.vintagestory.at/levelup) Mod Compatibility
-- [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience kill based on distance
-
-Future features:
-- Level UP Mod increase experience kill based on distance
+- Increase by World Age
+- [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience kill based on distance/height/age
 
 ### Observations
 RPG Difficulty simple changes the base max health when new entity spawn
@@ -24,7 +21,7 @@ For the harvest system to work correctly it is neccessary to modify the native f
 
 Make a backup of the world before adding this mod, any error can drastically increase the life of a creature which can ruin your gameplay.
 
-This mods changes the "animalLootDropRate", this can cause problems if you are removing the mod, if you are using the [Level UP](https://mods.vintagestory.at/levelup) theres a special section for that, if not consider harvesting any entity in the world spawn X:0 Y:110 Z:0 to reset the player status before removing the mod.
+This mods changes the "animalLootDropRate", this can cause problems if you are removing the mod, if you are using the [Level UP](https://mods.vintagestory.at/levelup) theres a special section for that, if not consider harvesting any entity in the world spawn X:0 Y:110 Z:0 to reset the player status before removing the mod. (Also set the world age status to 0)
 
 ### Considerations
 This mod changes some native functions and can break easily throught updates.

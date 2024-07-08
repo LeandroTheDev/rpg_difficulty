@@ -68,6 +68,7 @@ class LevelUPCompatibility
         // Increase the damage
         damage += (float)(damage * entityDamageSource.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
         damage += (float)(damage * entityDamageSource.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+        damage += (float)(damage * entityDamageSource.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
 
         // Empty status just continue
         if (damage - oldDamage == 0f) return;
@@ -95,11 +96,16 @@ class LevelUPCompatibility
     [HarmonyPatch(typeof(EntityBehaviorHarvestable), "SetHarvested")]
     public static void SetHarvestedKnifeStart(EntityBehaviorHarvestable __instance, IPlayer byPlayer, float dropQuantityMultiplier = 1f)
     {
-        // Check if player exist and options is enabled
-        if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
+        // Check if player exist and options are enabled
+        if (byPlayer != null &&
+        Configuration.lootStatsIncreaseEveryDistance == 0 &&
+        Configuration.lootStatsIncreaseEveryHeight == 0 &&
+        Configuration.lootStatsIncreaseEveryAge == 0) return;
 
         // Get the final droprate
-        float dropRateIncrease = (float)(__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + __instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight"));
+        float dropRateIncrease = (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance");
+        dropRateIncrease += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
+        dropRateIncrease += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseAge");
 
         // Checking if not exist any compatibility yet
         if (byPlayer.Entity.Attributes.GetFloat("LevelUP_BlockInteraction_Compatibility_ExtendHarvestDrop_SetHarvestedKnife") == 0f)
@@ -140,22 +146,11 @@ class DamageInteraction
             entityDamaged = damageSource.SourceEntity as EntityAgent;
         else return true;
 
-        // Blacklist Check
-        if (Configuration.enableBlacklist)
-            if (Configuration.blacklist.TryGetValue(entityDamaged.Code.ToString(), out double _))
-            { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is on blacklist, ignoring damage"); return true; }
-        // Whitelist Check
-        if (Configuration.enableWhitelist)
-            // In whitelist
-            if (Configuration.whitelist.TryGetValue(entityDamaged.Code.ToString(), out double _))
-            { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is on whitelist, increasing damage"); }
-            // Not in whitelist
-            else { if (Configuration.enableExtendedLog) Debug.Log($"{entityDamaged.Code} is not on whitelist, ignoring damage"); return true; }
-
         float oldDamage = damage;
         // Increase the damage
         damage += (float)(damage * entityDamaged.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
         damage += (float)(damage * entityDamaged.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+        damage += (float)(damage * entityDamaged.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
 
         if (Configuration.enableExtendedLog)
             Debug.Log($"{entityDamaged.Code} damage increased by {damage - oldDamage}");
@@ -214,7 +209,9 @@ class DamageInteraction
         if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
 
         // Get the final droprate
-        float dropRate = (float)Configuration.baseHarvest + (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance") + (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
+        float dropRate = (float)Configuration.baseHarvest + (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance");
+        dropRate += (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
+        dropRate += (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseAge");
 
         // Increasing entity drop rate
         byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate);
