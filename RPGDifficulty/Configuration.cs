@@ -215,7 +215,7 @@ public static class Configuration
 
         // Get whitelistDistance
         whitelistDistance.Clear();
-        Dictionary<string, object> tmpwhitelistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistDistance.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpwhitelistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistdistance.json")).ToObject<Dictionary<string, object>>();
         foreach (KeyValuePair<string, object> pair in tmpwhitelistDistance)
         {
             if (pair.Value is double value) whitelistDistance.Add(pair.Key, (double)value);
@@ -224,7 +224,7 @@ public static class Configuration
 
         // Get blacklistDistance
         blacklistDistance.Clear();
-        Dictionary<string, object> tmpblacklistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistDistance.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpblacklistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistdistance.json")).ToObject<Dictionary<string, object>>();
         foreach (KeyValuePair<string, object> pair in tmpblacklistDistance)
         {
             if (pair.Value is double value) blacklistDistance.Add(pair.Key, (double)value);
@@ -233,7 +233,7 @@ public static class Configuration
 
         // Get whitelistHeight
         whitelistHeight.Clear();
-        Dictionary<string, object> tmpwhitelistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistHeight.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpwhitelistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistheight.json")).ToObject<Dictionary<string, object>>();
         foreach (KeyValuePair<string, object> pair in tmpwhitelistHeight)
         {
             if (pair.Value is double value) whitelistHeight.Add(pair.Key, (double)value);
@@ -242,7 +242,7 @@ public static class Configuration
 
         // Get blacklistHeight
         blacklistHeight.Clear();
-        Dictionary<string, object> tmpblacklistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistHeight.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpblacklistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistheight.json")).ToObject<Dictionary<string, object>>();
         foreach (KeyValuePair<string, object> pair in tmpblacklistHeight)
         {
             if (pair.Value is double value) blacklistHeight.Add(pair.Key, (double)value);
@@ -251,7 +251,7 @@ public static class Configuration
 
         // Get whitelistAge
         whitelistAge.Clear();
-        Dictionary<string, object> tmpwhitelistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistAge.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpwhitelistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistage.json")).ToObject<Dictionary<string, object>>();
         foreach (KeyValuePair<string, object> pair in tmpwhitelistAge)
         {
             if (pair.Value is double value) whitelistAge.Add(pair.Key, (double)value);
@@ -260,7 +260,7 @@ public static class Configuration
 
         // Get blacklistAge
         blacklistAge.Clear();
-        Dictionary<string, object> tmpblacklistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistAge.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpblacklistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistage.json")).ToObject<Dictionary<string, object>>();
         foreach (KeyValuePair<string, object> pair in tmpblacklistAge)
         {
             if (pair.Value is double value) blacklistAge.Add(pair.Key, (double)value);
