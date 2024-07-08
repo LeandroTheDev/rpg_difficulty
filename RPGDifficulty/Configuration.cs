@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using RPGDifficulty;
 using Vintagestory.API.Common;
+using Vintagestory.API.Server;
 
 namespace LevelUP;
 
@@ -9,8 +10,12 @@ namespace LevelUP;
 public static class Configuration
 {
     #region baseconfigs
-    public static readonly Dictionary<string, double> whitelist = [];
-    public static readonly Dictionary<string, double> blacklist = [];
+    public static readonly Dictionary<string, double> whitelistDistance = [];
+    public static readonly Dictionary<string, double> blacklistDistance = [];
+    public static readonly Dictionary<string, double> whitelistHeight = [];
+    public static readonly Dictionary<string, double> blacklistHeight = [];
+    public static readonly Dictionary<string, double> whitelistAge = [];
+    public static readonly Dictionary<string, double> blacklistAge = [];
     public static bool enableWhitelist = false;
     public static bool enableBlacklist = true;
     public static bool enableStatusIncreaseByHeight = true;
@@ -28,6 +33,12 @@ public static class Configuration
     public static double lootStatsIncreaseEveryDistance = 0.1;
     public static double levelUPExperienceIncreaseEveryDistance = 0.1;
     public static int levelUPSecondsPositionUpdate = 1000;
+    public static bool enableStatusIncreaseByAge = true;
+    public static int increaseStatsEveryWorldDays = 5;
+    public static double lifeStatsIncreaseEveryAge = 0.1;
+    public static double damageStatsIncreaseEveryAge = 0.1;
+    public static double lootStatsIncreaseEveryAge = 0.1;
+    public static double levelUPExperienceIncreaseEveryAge = 0.1;
     public static bool enableExtendedLog = true;
 
     public static void UpdateBaseConfigurations(ICoreAPI api)
@@ -152,6 +163,48 @@ public static class Configuration
                 else levelUPSecondsPositionUpdate = (int)(long)value;
             else Debug.Log("CONFIGURATION ERROR: levelUPSecondsPositionUpdate not set");
         }
+        { //enableStatusIncreaseByAge
+            if (baseConfigs.TryGetValue("enableStatusIncreaseByAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByAge is null");
+                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableStatusIncreaseByAge is not boolean is {value.GetType()}");
+                else enableStatusIncreaseByAge = (bool)value;
+            else Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByAge not set");
+        }
+        { //increaseStatsEveryWorldDays
+            if (baseConfigs.TryGetValue("increaseStatsEveryWorldDays", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: increaseStatsEveryWorldDays is null");
+                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: increaseStatsEveryWorldDays is not int is {value.GetType()}");
+                else increaseStatsEveryWorldDays = (int)(long)value;
+            else Debug.Log("CONFIGURATION ERROR: increaseStatsEveryWorldDays not set");
+        }
+        { //lifeStatsIncreaseEveryAge
+            if (baseConfigs.TryGetValue("lifeStatsIncreaseEveryAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryAge is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lifeStatsIncreaseEveryAge is not double is {value.GetType()}");
+                else lifeStatsIncreaseEveryAge = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryAge not set");
+        }
+        { //damageStatsIncreaseEveryAge
+            if (baseConfigs.TryGetValue("damageStatsIncreaseEveryAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryAge is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: damageStatsIncreaseEveryAge is not double is {value.GetType()}");
+                else damageStatsIncreaseEveryAge = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryAge not set");
+        }
+        { //lootStatsIncreaseEveryAge
+            if (baseConfigs.TryGetValue("lootStatsIncreaseEveryAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryAge is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lootStatsIncreaseEveryAge is not double is {value.GetType()}");
+                else lootStatsIncreaseEveryAge = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryAge not set");
+        }
+        { //levelUPExperienceIncreaseEveryAge
+            if (baseConfigs.TryGetValue("levelUPExperienceIncreaseEveryAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is not double is {value.GetType()}");
+                else levelUPExperienceIncreaseEveryAge = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge not set");
+        }
         { //enableExtendedLog
             if (baseConfigs.TryGetValue("enableExtendedLog", out object value))
                 if (value is null) Debug.Log("CONFIGURATION ERROR: enableExtendedLog is null");
@@ -160,21 +213,57 @@ public static class Configuration
             else Debug.Log("CONFIGURATION ERROR: enableExtendedLog not set");
         }
 
-        // Get whitelist
-        whitelist.Clear();
-        Dictionary<string, object> tmpwhitelist = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelist.json")).ToObject<Dictionary<string, object>>();
-        foreach (KeyValuePair<string, object> pair in tmpwhitelist)
+        // Get whitelistDistance
+        whitelistDistance.Clear();
+        Dictionary<string, object> tmpwhitelistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistDistance.json")).ToObject<Dictionary<string, object>>();
+        foreach (KeyValuePair<string, object> pair in tmpwhitelistDistance)
         {
-            if (pair.Value is double value) whitelist.Add(pair.Key, (double)value);
+            if (pair.Value is double value) whitelistDistance.Add(pair.Key, (double)value);
+            else Debug.Log($"CONFIGURATION ERROR: whitelistDistance {pair.Key} is not double");
+        }
+
+        // Get blacklistDistance
+        blacklistDistance.Clear();
+        Dictionary<string, object> tmpblacklistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistDistance.json")).ToObject<Dictionary<string, object>>();
+        foreach (KeyValuePair<string, object> pair in tmpblacklistDistance)
+        {
+            if (pair.Value is double value) blacklistDistance.Add(pair.Key, (double)value);
             else Debug.Log($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
         }
 
-        // Get blacklist
-        blacklist.Clear();
-        Dictionary<string, object> tmpblacklist = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklist.json")).ToObject<Dictionary<string, object>>();
-        foreach (KeyValuePair<string, object> pair in tmpblacklist)
+        // Get whitelistHeight
+        whitelistHeight.Clear();
+        Dictionary<string, object> tmpwhitelistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistHeight.json")).ToObject<Dictionary<string, object>>();
+        foreach (KeyValuePair<string, object> pair in tmpwhitelistHeight)
         {
-            if (pair.Value is double value) blacklist.Add(pair.Key, (double)value);
+            if (pair.Value is double value) whitelistHeight.Add(pair.Key, (double)value);
+            else Debug.Log($"CONFIGURATION ERROR: whitelistHeight {pair.Key} is not double");
+        }
+
+        // Get blacklistHeight
+        blacklistHeight.Clear();
+        Dictionary<string, object> tmpblacklistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistHeight.json")).ToObject<Dictionary<string, object>>();
+        foreach (KeyValuePair<string, object> pair in tmpblacklistHeight)
+        {
+            if (pair.Value is double value) blacklistHeight.Add(pair.Key, (double)value);
+            else Debug.Log($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
+        }
+
+        // Get whitelistAge
+        whitelistAge.Clear();
+        Dictionary<string, object> tmpwhitelistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistAge.json")).ToObject<Dictionary<string, object>>();
+        foreach (KeyValuePair<string, object> pair in tmpwhitelistAge)
+        {
+            if (pair.Value is double value) whitelistAge.Add(pair.Key, (double)value);
+            else Debug.Log($"CONFIGURATION ERROR: whitelistAge {pair.Key} is not double");
+        }
+
+        // Get blacklistAge
+        blacklistAge.Clear();
+        Dictionary<string, object> tmpblacklistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistAge.json")).ToObject<Dictionary<string, object>>();
+        foreach (KeyValuePair<string, object> pair in tmpblacklistAge)
+        {
+            if (pair.Value is double value) blacklistAge.Add(pair.Key, (double)value);
             else Debug.Log($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
         }
     }
@@ -197,6 +286,66 @@ public static class Configuration
         Debug.Log($"CONFIG: lootStatsIncreaseEveryDistance, value: {lootStatsIncreaseEveryDistance}");
         Debug.Log($"CONFIG: levelUPExperienceIncreaseEveryDistance, value: {levelUPExperienceIncreaseEveryDistance}");
         Debug.Log($"CONFIG: enableExtendedLog, value: {enableExtendedLog}");
+    }
+
+    public static int GetStatusByWorldAge(ICoreServerAPI serverAPI)
+    => (int)serverAPI.World.Calendar.ElapsedDays / increaseStatsEveryWorldDays;
+
+    /// Returns false for NO status increase
+    /// True for status increase
+    public static bool BlackWhiteListCheckForDistance(string entityCode)
+    {
+        // Blacklist Check
+        if (enableBlacklist)
+            if (blacklistDistance.TryGetValue(entityCode, out double _))
+            { if (enableExtendedLog) Debug.Log($"{entityCode} is on blacklist, ignoring stats distance"); return false; }
+        // Whitelist Check
+        if (enableWhitelist)
+            // In whitelist
+            if (whitelistDistance.TryGetValue(entityCode, out double _))
+            { if (enableExtendedLog) Debug.Log($"{entityCode} is on whitelist, increasing stats distance"); return true; }
+            // Not in whitelist
+            else { if (enableExtendedLog) Debug.Log($"{entityCode} is not on whitelist, ignoring stats distance"); return false; }
+        // Check success 
+        return true;
+    }
+
+    /// Returns false for NO status increase
+    /// True for status increase
+    public static bool BlackWhiteListCheckForHeight(string entityCode)
+    {
+        // Blacklist Check
+        if (enableBlacklist)
+            if (blacklistHeight.TryGetValue(entityCode, out double _))
+            { if (enableExtendedLog) Debug.Log($"{entityCode} is on blacklist, ignoring stats height"); return false; }
+        // Whitelist Check
+        if (enableWhitelist)
+            // In whitelist
+            if (whitelistHeight.TryGetValue(entityCode, out double _))
+            { if (enableExtendedLog) Debug.Log($"{entityCode} is on whitelist, increasing stats height"); return true; }
+            // Not in whitelist
+            else { if (enableExtendedLog) Debug.Log($"{entityCode} is not on whitelist, ignoring stats height"); return false; }
+        // Check success 
+        return true;
+    }
+
+    /// Returns false for NO status increase
+    /// True for status increase
+    public static bool BlackWhiteListCheckForAge(string entityCode)
+    {
+        // Blacklist Check
+        if (enableBlacklist)
+            if (blacklistAge.TryGetValue(entityCode, out double _))
+            { if (enableExtendedLog) Debug.Log($"{entityCode} is on blacklist, ignoring stats age"); return false; }
+        // Whitelist Check
+        if (enableWhitelist)
+            // In whitelist
+            if (whitelistAge.TryGetValue(entityCode, out double _))
+            { if (enableExtendedLog) Debug.Log($"{entityCode} is on whitelist, increasing stats age"); return true; }
+            // Not in whitelist
+            else { if (enableExtendedLog) Debug.Log($"{entityCode} is not on whitelist, ignoring stats age"); return false; }
+        // Check success 
+        return true;
     }
     #endregion
 }
