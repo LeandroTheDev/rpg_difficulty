@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Newtonsoft.Json;
 using RPGDifficulty;
 using Vintagestory.API.Common;
 using Vintagestory.API.Server;
@@ -9,6 +11,75 @@ namespace LevelUP;
 #pragma warning disable CA2211
 public static class Configuration
 {
+    private static Dictionary<string, object> LoadConfigurationByDirectoryAndName(ICoreAPI api, string directory, string name, string defaultDirectory)
+    {
+        string directoryPath = Path.Combine(api.DataBasePath, directory);
+        string configPath = Path.Combine(api.DataBasePath, directory, $"{name}.json");
+        Dictionary<string, object> loadedConfig;
+        try
+        {
+            // Load server configurations
+            string jsonConfig = File.ReadAllText(configPath);
+            loadedConfig = JsonConvert.DeserializeObject<Dictionary<string, object>>(jsonConfig);
+        }
+        catch (DirectoryNotFoundException)
+        {
+            Debug.Log($"WARNING: Server configurations directory does not exist creating {name}.json and directory...");
+            try
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log($"ERROR: Cannot create directory: {ex.Message}");
+            }
+            Debug.Log("Loading default configurations...");
+            // Load default configurations
+            loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
+
+            Debug.Log($"Configurations loaded, saving configs in: {configPath}");
+            try
+            {
+                // Saving default configurations
+                string defaultJson = JsonConvert.SerializeObject(loadedConfig, Formatting.Indented);
+                File.WriteAllText(configPath, defaultJson);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log($"ERROR: Cannot save default files to {configPath}, reason: {ex.Message}");
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            Debug.Log($"WARNING: Server configurations {name}.json cannot be found, recreating file from default");
+            Debug.Log("Loading default configurations...");
+            // Load default configurations
+            loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
+
+            Debug.Log($"Configurations loaded, saving configs in: {configPath}");
+            try
+            {
+                // Saving default configurations
+                string defaultJson = JsonConvert.SerializeObject(loadedConfig, Formatting.Indented);
+                File.WriteAllText(configPath, defaultJson);
+            }
+            catch (Exception ex)
+            {
+                Debug.Log($"ERROR: Cannot save default files to {configPath}, reason: {ex.Message}");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Debug.Log($"ERROR: Cannot read the server configurations: {ex.Message}");
+            Debug.Log("Loading default values from mod assets...");
+            // Load default configurations
+            loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
+        }
+        return loadedConfig;
+    }
+
+
     #region baseconfigs
     public static readonly Dictionary<string, double> whitelistDistance = [];
     public static readonly Dictionary<string, double> blacklistDistance = [];
@@ -43,7 +114,12 @@ public static class Configuration
 
     public static void UpdateBaseConfigurations(ICoreAPI api)
     {
-        Dictionary<string, object> baseConfigs = api.Assets.Get(new AssetLocation("rpgdifficulty:config/base.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> baseConfigs = LoadConfigurationByDirectoryAndName(
+            api,
+            "ModConfig/RPGDifficulty/config",
+            "base",
+            "rpgdifficulty:config/base.json"
+        );
         { //enableWhitelist
             if (baseConfigs.TryGetValue("enableWhitelist", out object value))
                 if (value is null) Debug.Log("CONFIGURATION ERROR: enableWhitelist is null");
@@ -215,7 +291,12 @@ public static class Configuration
 
         // Get whitelistDistance
         whitelistDistance.Clear();
-        Dictionary<string, object> tmpwhitelistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistdistance.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpwhitelistDistance = LoadConfigurationByDirectoryAndName(
+            api,
+            "ModConfig/RPGDifficulty/config",
+            "whitelistdistance",
+            "rpgdifficulty:config/whitelistdistance.json"
+        );
         foreach (KeyValuePair<string, object> pair in tmpwhitelistDistance)
         {
             if (pair.Value is double value) whitelistDistance.Add(pair.Key, (double)value);
@@ -224,7 +305,12 @@ public static class Configuration
 
         // Get blacklistDistance
         blacklistDistance.Clear();
-        Dictionary<string, object> tmpblacklistDistance = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistdistance.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpblacklistDistance = LoadConfigurationByDirectoryAndName(
+            api,
+            "ModConfig/RPGDifficulty/config",
+            "blacklistdistance",
+            "rpgdifficulty:config/blacklistdistance.json"
+        );
         foreach (KeyValuePair<string, object> pair in tmpblacklistDistance)
         {
             if (pair.Value is double value) blacklistDistance.Add(pair.Key, (double)value);
@@ -233,7 +319,12 @@ public static class Configuration
 
         // Get whitelistHeight
         whitelistHeight.Clear();
-        Dictionary<string, object> tmpwhitelistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistheight.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpwhitelistHeight = LoadConfigurationByDirectoryAndName(
+            api,
+            "ModConfig/RPGDifficulty/config",
+            "whitelistheight",
+            "rpgdifficulty:config/whitelistheight.json"
+        );
         foreach (KeyValuePair<string, object> pair in tmpwhitelistHeight)
         {
             if (pair.Value is double value) whitelistHeight.Add(pair.Key, (double)value);
@@ -242,7 +333,12 @@ public static class Configuration
 
         // Get blacklistHeight
         blacklistHeight.Clear();
-        Dictionary<string, object> tmpblacklistHeight = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistheight.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpblacklistHeight = LoadConfigurationByDirectoryAndName(
+            api,
+            "ModConfig/RPGDifficulty/config",
+            "blacklistheight",
+            "rpgdifficulty:config/blacklistheight.json"
+        );
         foreach (KeyValuePair<string, object> pair in tmpblacklistHeight)
         {
             if (pair.Value is double value) blacklistHeight.Add(pair.Key, (double)value);
@@ -251,7 +347,12 @@ public static class Configuration
 
         // Get whitelistAge
         whitelistAge.Clear();
-        Dictionary<string, object> tmpwhitelistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/whitelistage.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpwhitelistAge = LoadConfigurationByDirectoryAndName(
+            api,
+            "ModConfig/RPGDifficulty/config",
+            "whitelistage",
+            "rpgdifficulty:config/whitelistage.json"
+        );
         foreach (KeyValuePair<string, object> pair in tmpwhitelistAge)
         {
             if (pair.Value is double value) whitelistAge.Add(pair.Key, (double)value);
@@ -260,7 +361,12 @@ public static class Configuration
 
         // Get blacklistAge
         blacklistAge.Clear();
-        Dictionary<string, object> tmpblacklistAge = api.Assets.Get(new AssetLocation("rpgdifficulty:config/blacklistage.json")).ToObject<Dictionary<string, object>>();
+        Dictionary<string, object> tmpblacklistAge = LoadConfigurationByDirectoryAndName(
+            api,
+            "ModConfig/RPGDifficulty/config",
+            "blacklistage",
+            "rpgdifficulty:config/blacklistage.json"
+        );
         foreach (KeyValuePair<string, object> pair in tmpblacklistAge)
         {
             if (pair.Value is double value) blacklistAge.Add(pair.Key, (double)value);
