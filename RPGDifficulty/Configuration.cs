@@ -4,7 +4,6 @@ using System.IO;
 using Newtonsoft.Json;
 using RPGDifficulty;
 using Vintagestory.API.Common;
-using Vintagestory.API.Server;
 
 namespace LevelUP;
 
@@ -394,7 +393,7 @@ public static class Configuration
         Debug.Log($"CONFIG: enableExtendedLog, value: {enableExtendedLog}");
     }
 
-    public static int GetStatusByWorldAge(ICoreServerAPI serverAPI)
+    public static int GetStatusByWorldAge(ICoreAPI serverAPI)
     => (int)serverAPI.World.Calendar.ElapsedDays / increaseStatsEveryWorldDays;
 
     /// Returns false for NO status increase

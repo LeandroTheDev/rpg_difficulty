@@ -6,22 +6,22 @@ Features:
 - Whitelist
 - Life status increase
 - Damage status increase
-- Loot drop increase
+- Loot drop status increase
 - Increase by distance
 - Increase by height
 - Increase by World Age
-- [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience kill based on distance/height/age
+- [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience based on distance/height/age
 
 ### Observations
-RPG Difficulty simple changes the base max health when new entity spawn
+RPG Difficulty simple changes the base max health when new entity spawn, ``for ever``, the  entity will always have that health on the world even if the mod is removed
 
-For the damage system to work correctly it is necessary to change the native function "ReceiveDamage", so mods that change the damage function will not work with RPG Difficulty
+For the damage system to work correctly the mod ``overwrites`` the damage configuration from assets and increase it based on distance/height/age, but if you remove the mod this ``overwrite`` will no longer exist, and the entity will have the previously damage from configuration
 
-For the harvest system to work correctly it is neccessary to modify the native function "SetHarvested", this just creates a simple prefix to change the player "animalLootDropRate" status, and probably is compatibile with everthing.
+For the harvest system to work correctly it is neccessary to modify the native function "SetHarvested", this just creates a simple prefix to change the dropMultiply.
+
+The mod is very compatible with other mods, any incompatibility you can contact me.
 
 Make a backup of the world before adding this mod, any error can drastically increase the life of a creature which can ruin your gameplay.
-
-This mods changes the "animalLootDropRate", this can cause problems if you are removing the mod, if you are using the [Level UP](https://mods.vintagestory.at/levelup) theres a special section for that, if not consider harvesting any entity in the world spawn X:0 Y:110 Z:0 to reset the player status before removing the mod. (Also set the world age status to 0)
 
 ### Considerations
 This mod changes some native functions and can break easily throught updates.

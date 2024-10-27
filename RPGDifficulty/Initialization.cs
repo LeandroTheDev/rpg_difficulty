@@ -4,19 +4,17 @@ using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Server;
 using Vintagestory.GameContent;
-
 namespace RPGDifficulty;
 
-public class RPGDifficultyModSystem : ModSystem
+public class Initialization : ModSystem
 {
     readonly Overwrite overwriter = new();
     ICoreServerAPI serverAPI;
+    public static EntityPos DefaultSpawnPosition { get; private set; }
     public override void StartServerSide(ICoreServerAPI api)
     {
         base.StartServerSide(api);
         serverAPI = api;
-        // Event instaciation
-        api.Event.OnEntitySpawn += IncreaseEntityStats;
         // Create the timer only with levelup compatibility
         if (overwriter.levelUPCompatibility && Configuration.levelUPExperienceIncreaseEveryDistance != 0.0 && Configuration.levelUPExperienceIncreaseEveryHeight != 0.0)
         {
@@ -24,6 +22,25 @@ public class RPGDifficultyModSystem : ModSystem
             api.Event.Timer(OnTimerElapsed, Configuration.levelUPSecondsPositionUpdate);
             Debug.Log($"Updating player experience multiplier every {Configuration.levelUPSecondsPositionUpdate} second");
             api.Event.PlayerDisconnect += PlayerDisconnected;
+        }
+
+        // Timer to get world spawn position
+        {
+            var timer = new System.Timers.Timer(200)
+            {
+                AutoReset = true,
+                Enabled = true
+            };
+            timer.Elapsed += (_, _) =>
+            {
+                try
+                {
+                    DefaultSpawnPosition = api.World.DefaultSpawnPosition;
+                    timer.Stop();
+                    timer.Dispose();
+                }
+                catch (Exception) { }
+            };
         }
     }
 
@@ -116,8 +133,12 @@ public class RPGDifficultyModSystem : ModSystem
         overwriter.overwriter?.UnpatchAll();
     }
 
-    private void IncreaseEntityStats(Entity entity)
+    public static void IncreaseEntityStats(Entity entity)
     {
+        // Disclcaimer: for some reason the spawn position takes way too long to load, so in first loads we need to ignore it unfurtunally
+        // entity.Api.World.DefaultSpawnPosition.X
+        if (DefaultSpawnPosition == null) return;
+
         // Ignore non creature
         if (!entity.IsCreature) return;
 
@@ -125,17 +146,19 @@ public class RPGDifficultyModSystem : ModSystem
         bool increaseByHeight = Configuration.BlackWhiteListCheckForHeight(entity.Code.ToString());
         bool increaseByAge = Configuration.BlackWhiteListCheckForAge(entity.Code.ToString());
 
+        entity.Attributes.SetBool("RPGDifficultyAlreadySet", true);
+
         // Function for increasing entity stats
         void increaseStats()
         {
             int statsIncreaseDistance = 0;
             int statsIncreaseHeight = 0;
-            int statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
+            int statsIncreaseAge = Configuration.GetStatusByWorldAge(entity.Api);
             // Stats increasing
             {
                 // Coordinates
-                double entityX = entity.Pos.X - serverAPI.World.DefaultSpawnPosition.X;
-                double entityZ = entity.Pos.Z - serverAPI.World.DefaultSpawnPosition.Z;
+                double entityX = entity.Pos.X - DefaultSpawnPosition.X;
+                double entityZ = entity.Pos.Z - DefaultSpawnPosition.Z;
                 double entityY = entity.Pos.Y;
 
                 // XZ Coordinates translations
@@ -176,8 +199,10 @@ public class RPGDifficultyModSystem : ModSystem
                     }
                 }
             }
+
             // Single player / Lan treatment
             if (entity.SidedProperties == null) return;
+
             // Changing Health Stats
             EntityBehaviorHealth entityLifeStats = entity.GetBehavior<EntityBehaviorHealth>();
             // Check existance, for example buttlerfly doesn't have a life status
@@ -217,7 +242,6 @@ public class RPGDifficultyModSystem : ModSystem
                     entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseHeight", Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight);
                 if (increaseByAge)
                     entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseAge", Configuration.lootStatsIncreaseEveryAge * statsIncreaseAge);
-
 
                 if (Configuration.enableExtendedLog)
                     Debug.Log($"{entity.Code} increasing max health in: {entityLifeStats.BaseMaxHealth - oldBaseMaxHealth} damage percentage: {(Configuration.damageStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.damageStatsIncreaseEveryHeight * statsIncreaseHeight)} loot percentage: {(Configuration.lootStatsIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.lootStatsIncreaseEveryHeight * statsIncreaseHeight)}");
