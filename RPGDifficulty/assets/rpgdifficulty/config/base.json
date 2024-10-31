@@ -3,6 +3,16 @@
     "enableBlacklist": true,
     "baseHarvest": 0.5,
 
+    "enableStatusVariation": true,
+    "minimumVariableStatusAverage": 0.5,
+    "maxVariableStatusAverage": 1.5,
+
+    "increaseDamageTier": true,
+    "damageTierIncreaseEveryDamage": 5,
+
+    "rpgOverlayOverwriteLevel": true,
+    "rpgOverlayIncreaseLevelEveryAdditionalHP": 3,
+
     "enableStatusIncreaseByHeight": true,
     "increaseStatsEveryDownHeight": 10,
     "baseStatusHeight": 110,

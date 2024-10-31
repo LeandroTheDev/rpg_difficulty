@@ -51,6 +51,9 @@ class DamageInteraction
         damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
         damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
 
+        if(Configuration.enableStatusVariation)
+            damage *= __instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+
         string data = taskConfig.Token?.ToString();
 
         // Parsing the readonly object into editable object
@@ -88,10 +91,13 @@ class DamageInteraction
 
         // Get the final droprate
         float dropRate = (float)Configuration.baseHarvest + (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance");
-        dropRate += (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
-        dropRate += (float)byPlayer.Entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseAge");
+        dropRate += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
+        dropRate += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseAge");
 
         dropQuantityMultiplier += dropRate;
+
+        if(Configuration.enableStatusVariation)
+            dropQuantityMultiplier *= __instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
         if (Configuration.enableExtendedLog)
             Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
