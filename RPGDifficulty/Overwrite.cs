@@ -44,12 +44,19 @@ class DamageInteraction
 
         #region Damage
         float damage = taskConfig["damage"].AsFloat();
+        int damageTier = taskConfig["damageTier"].AsInt();
         if (damage == 0f) return;
 
         // Increase the damage
         damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
         damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
         damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
+
+        // Increase the damage tier
+        if(Configuration.increaseDamageTier)
+            for(int i = 0; i < damage; i++)
+                if(i % Configuration.damageTierIncreaseEveryDamage == 0)
+                    damageTier++;
 
         if(Configuration.enableStatusVariation)
             damage *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
@@ -74,6 +81,7 @@ class DamageInteraction
         {
             // Redefining the damage
             jsonObject["damage"] = damage;
+            jsonObject["damageTier"] = damageTier;
         }
 
         // Updating the json

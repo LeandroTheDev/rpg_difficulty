@@ -13,6 +13,8 @@ Features:
 - Status variations
 - [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience based on distance/height/age
 
+Everything is configurable, check the [wiki](https://github.com/LeandroTheDev/rpg_difficulty/wiki) for more informations about configurations
+
 ### Observations
 For the health system to work, we change the base max health when new entity spawn, ``for ever``, the  entity will always have that health on the world even if the mod is removed
 
