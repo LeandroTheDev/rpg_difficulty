@@ -53,12 +53,12 @@ class DamageInteraction
         damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
 
         // Increase the damage tier
-        if(Configuration.increaseDamageTier)
-            for(int i = 0; i < damage; i++)
-                if(i % Configuration.damageTierIncreaseEveryDamage == 0)
+        if (Configuration.increaseDamageTier)
+            for (int i = 0; i < damage; i++)
+                if (i % Configuration.damageTierIncreaseEveryDamage == 0)
                     damageTier++;
 
-        if(Configuration.enableStatusVariation)
+        if (Configuration.enableStatusVariation)
             damage *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
         string data = taskConfig.Token?.ToString();
@@ -104,7 +104,7 @@ class DamageInteraction
 
         dropQuantityMultiplier += dropRate;
 
-        if(Configuration.enableStatusVariation)
+        if (Configuration.enableStatusVariation)
             dropQuantityMultiplier *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
         if (Configuration.enableExtendedLog)
