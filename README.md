@@ -10,22 +10,21 @@ Features:
 - Increase by distance
 - Increase by height
 - Increase by World Age
+- Status variations
 - [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience based on distance/height/age
 
 ### Observations
-RPG Difficulty simple changes the base max health when new entity spawn, ``for ever``, the  entity will always have that health on the world even if the mod is removed
+For the health system to work, we change the base max health when new entity spawn, ``for ever``, the  entity will always have that health on the world even if the mod is removed
 
-For the damage system to work correctly the mod ``overwrites`` the damage configuration from assets and increase it based on distance/height/age, but if you remove the mod this ``overwrite`` will no longer exist, and the entity will have the previously damage from configuration
+For the damage system to work correctly the mod ``overwrites`` the damage configuration from assets and increase it, but if you remove the mod this ``overwrite`` will no longer exist, and the entity will have the previously damage from configuration.
 
-For the harvest system to work correctly it is neccessary to modify the native function "SetHarvested", this just creates a simple prefix to change the dropMultiply.
+For the harvest system to work correctly the mod ``overwrites`` the harvest system and increase the multiply result, if the mod is removed the additional multiply will no longer exist.
 
 The mod is very compatible with other mods, any incompatibility you can contact me.
 
 Make a backup of the world before adding this mod, any error can drastically increase the life of a creature which can ruin your gameplay.
 
 ### Considerations
-This mod changes some native functions and can break easily throught updates.
-
 By default the blacklist with "game:player" is enabled, because of course we dont wanna get the players to receive the buffs from distance when entering in the server, but if you want feel free to remove it.
 
 Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity spawn in the world, but of course only if entity has a health status, if the entity doesn't have a health status is ignored by the mod, like anything that move and is not alive (arrows,  rocks, buttlerfly (yeah buttlerfly doesn't have health)).
