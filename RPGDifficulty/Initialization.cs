@@ -55,6 +55,7 @@ public class Initialization : ModSystem
         {
             int statsIncreaseDistance = 0;
             int statsIncreaseHeight = 0;
+            int statsIncreaseAge = 0;
             // Stats increasing
             {
                 // Coordinates
@@ -99,9 +100,14 @@ public class Initialization : ModSystem
                         statsIncreaseHeight++;
                     }
                 }
+
+                // Age Calculation
+                if (Configuration.enableStatusIncreaseByAge) {
+                    statsIncreaseAge = Configuration.GetStatusByWorldAge(entity.Api);
+                }
             }
             // Set global experience for LevelUP compatibility layer
-            player.Entity.Attributes.SetFloat("LevelUP_Server_Instance_ExperienceMultiplier_IncreaseExp", (float)((Configuration.levelUPExperienceIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.levelUPExperienceIncreaseEveryHeight * statsIncreaseHeight)));
+            player.Entity.Attributes.SetFloat("LevelUP_Server_Instance_ExperienceMultiplier_IncreaseExp", (float)((Configuration.levelUPExperienceIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.levelUPExperienceIncreaseEveryHeight * statsIncreaseHeight) + (Configuration.levelUPExperienceIncreaseEveryAge * statsIncreaseAge)));
         }
     }
 

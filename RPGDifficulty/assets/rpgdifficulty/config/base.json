@@ -1,7 +1,7 @@
 {
     "enableWhitelist": false,
     "enableBlacklist": true,
-    "baseHarvest": 0.5,
+    "baseHarvest": 0.0,
 
     "enableStatusVariation": true,
     "minimumVariableStatusAverage": 0.5,
@@ -27,7 +27,6 @@
     "damageStatsIncreaseEveryDistance": 0.1,
     "lootStatsIncreaseEveryDistance": 0.1,
     "levelUPExperienceIncreaseEveryDistance": 0.2,
-    "levelUPSecondsPositionUpdate": 5,
 
     "enableStatusIncreaseByAge": true,
     "increaseStatsEveryWorldDays": 5,
@@ -36,5 +35,6 @@
     "lootStatsIncreaseEveryAge": 0.1,
     "levelUPExperienceIncreaseEveryAge": 0.1,
     
+    "levelUPSecondsPositionUpdate": 5,
     "enableExtendedLog": true
 }
