@@ -52,7 +52,7 @@ class DamageInteraction
         damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
 
         if(Configuration.enableStatusVariation)
-            damage *= __instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+            damage *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
         string data = taskConfig.Token?.ToString();
 
@@ -97,7 +97,7 @@ class DamageInteraction
         dropQuantityMultiplier += dropRate;
 
         if(Configuration.enableStatusVariation)
-            dropQuantityMultiplier *= __instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+            dropQuantityMultiplier *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
         if (Configuration.enableExtendedLog)
             Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
