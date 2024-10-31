@@ -102,8 +102,9 @@ public class Initialization : ModSystem
                 }
 
                 // Age Calculation
-                if (Configuration.enableStatusIncreaseByAge) {
-                    statsIncreaseAge = Configuration.GetStatusByWorldAge(entity.Api);
+                if (Configuration.enableStatusIncreaseByAge)
+                {
+                    statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
                 }
             }
             // Set global experience for LevelUP compatibility layer
@@ -240,7 +241,8 @@ public class Initialization : ModSystem
 
                 // Getting variation
                 double variation = 0;
-                if (Configuration.enableStatusVariation) {
+                if (Configuration.enableStatusVariation)
+                {
                     Random random = new();
                     variation = Configuration.minimumVariableStatusAverage + (Configuration.maxVariableStatusAverage - Configuration.minimumVariableStatusAverage) * random.NextDouble();
                     variation = Math.Round(variation, 2);
@@ -267,27 +269,33 @@ public class Initialization : ModSystem
                     entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseAge", Configuration.lootStatsIncreaseEveryAge * statsIncreaseAge);
 
                 // RPGOverlay compatibility
-                if(Configuration.rpgOverlayOverwriteLevel) {
+                if (Configuration.rpgOverlayOverwriteLevel)
+                {
                     int additionalLevels = 0;
                     bool reducedAdditionalLevels = false;
                     double healthDifference = entityLifeStats.BaseMaxHealth - oldBaseMaxHealth;
                     // Check if the health is less
-                    if(healthDifference < 0){ 
+                    if (healthDifference < 0)
+                    {
                         healthDifference = Math.Abs(healthDifference);
                         reducedAdditionalLevels = true;
                     }
 
-                    for(int i = 0; i < (int)healthDifference; i++) {
+                    for (int i = 0; i < (int)healthDifference; i++)
+                    {
                         // If i is multiply of rpgOverlayIncreaseLevelEveryAdditionalHP
-                        if(i % Configuration.rpgOverlayIncreaseLevelEveryAdditionalHP == 0) {
+                        if (i % Configuration.rpgOverlayIncreaseLevelEveryAdditionalHP == 0)
+                        {
                             // increasing the level
                             additionalLevels++;
                         }
                     }
-                    
-                    if(additionalLevels != 0) {
+
+                    if (additionalLevels != 0)
+                    {
                         // Transforms the additionaLevels in negative if is to be reduced
-                        if(reducedAdditionalLevels) {
+                        if (reducedAdditionalLevels)
+                        {
                             additionalLevels = -additionalLevels;
                         }
 
