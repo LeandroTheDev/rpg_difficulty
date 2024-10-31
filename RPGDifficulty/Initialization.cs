@@ -235,15 +235,15 @@ public class Initialization : ModSystem
                 // Getting variation
                 double variation = 0;
                 if (Configuration.enableStatusVariation) {
-                    Random random = new Random();
+                    Random random = new();
                     variation = Configuration.minimumVariableStatusAverage + (Configuration.maxVariableStatusAverage - Configuration.minimumVariableStatusAverage) * random.NextDouble();
                     variation = Math.Round(variation, 2);
                     entity.Attributes.SetDouble("RPGDifficultyStatusVariation", variation);
 
                     // Changing health after variation calculation
-                    entityLifeStats.BaseMaxHealth *= variation;
-                    entityLifeStats.MaxHealth *= variation;
-                    entityLifeStats.Health *= variation;
+                    entityLifeStats.BaseMaxHealth *= (float)variation;
+                    entityLifeStats.MaxHealth *= (float)variation;
+                    entityLifeStats.Health *= (float)variation;
                 }
 
                 // Setting compatibility variables
@@ -286,7 +286,7 @@ public class Initialization : ModSystem
                         }
 
                         // Checking if not exist any compatibility yet
-                        if (byPlayer.Entity.Attributes.GetInt("RPGOverlayAddOrReduceLevels") == 0)
+                        if (entity.WatchedAttributes.GetInt("RPGOverlayAddOrReduceLevels") == 0)
                         {
                             // Simple create new level if not exist
                             entity.WatchedAttributes.SetInt("RPGOverlayAddOrReduceLevels", additionalLevels);
