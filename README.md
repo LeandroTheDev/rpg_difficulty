@@ -9,9 +9,11 @@ Features:
 - Loot drop status increase
 - Increase by distance
 - Increase by height
-- Increase by World Age
+- Increase by world age
 - Status variations
+- Condition to spawn based on distance/height/age
 - [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience based on distance/height/age
+- [SpawnersAPI](https://mods.vintagestory.at/spawnersapi) Mod compatibility to ignore spawn conditions
 
 Everything is configurable, check the [wiki](https://github.com/LeandroTheDev/rpg_difficulty/wiki) for more informations about configurations
 
@@ -29,9 +31,7 @@ Make a backup of the world before adding this mod, any error can drastically inc
 ### Considerations
 By default the blacklist with "game:player" is enabled, because of course we dont wanna get the players to receive the buffs from distance when entering in the server, but if you want feel free to remove it.
 
-Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity spawn in the world, but of course only if entity has a health status, if the entity doesn't have a health status is ignored by the mod, like anything that move and is not alive (arrows,  rocks, buttlerfly (yeah buttlerfly doesn't have health)).
-
-The configuration enableExtended logs can cause performances problems, because a lot of things in the mod is constantly logging, if the mod is very stable in your world/modpack please consider desabling it in configurations
+Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity creature spawn in the world.
 
 ### About RPG Difficulty
 RPG Difficulty is open source project and can easily be accessed on the github, all contents from this mod is completly free.
