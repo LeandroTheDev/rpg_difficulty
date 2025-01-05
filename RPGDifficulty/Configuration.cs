@@ -107,6 +107,9 @@ public static class Configuration
     public static double lifeStatsIncreaseEveryHeight = 0.1;
     public static double damageStatsIncreaseEveryHeight = 0.1;
     public static double lootStatsIncreaseEveryHeight = 0.1;
+    public static double maximumLifeStatusIncreasedByHeight = 2.0;
+    public static double maximumDamageStatusIncreasedByHeight = 2.0;
+    public static double maximumLootStatusIncreasedByHeight = 2.0;
     public static double levelUPExperienceIncreaseEveryHeight = 0.1;
 
     public static bool enableStatusIncreaseByDistance = true;
@@ -114,6 +117,9 @@ public static class Configuration
     public static double lifeStatsIncreaseEveryDistance = 0.1;
     public static double damageStatsIncreaseEveryDistance = 0.1;
     public static double lootStatsIncreaseEveryDistance = 0.1;
+    public static double maximumLifeStatusIncreasedByDistance = 10.0;
+    public static double maximumDamageStatusIncreasedByDistance = 10.0;
+    public static double maximumLootStatusIncreasedByDistance = 10.0;
     public static double levelUPExperienceIncreaseEveryDistance = 0.1;
 
     public static bool enableStatusIncreaseByAge = true;
@@ -121,7 +127,12 @@ public static class Configuration
     public static double lifeStatsIncreaseEveryAge = 0.1;
     public static double damageStatsIncreaseEveryAge = 0.1;
     public static double lootStatsIncreaseEveryAge = 0.1;
+    public static double maximumLifeStatusIncreasedByAge = 2.0;
+    public static double maximumDamageStatusIncreasedByAge = 2.0;
+    public static double maximumLootStatusIncreasedByAge = 2.0;
     public static double levelUPExperienceIncreaseEveryAge = 0.1;
+
+    public static List<object> entitySpawnConditions = [];
 
     public static int levelUPSecondsPositionUpdate = 1000;
     public static bool enableExtendedLog = true;
@@ -246,6 +257,27 @@ public static class Configuration
                 else lootStatsIncreaseEveryHeight = (double)value;
             else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryHeight not set");
         }
+        { //maximumLifeStatusIncreasedByHeight
+            if (baseConfigs.TryGetValue("maximumLifeStatusIncreasedByHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight is not double is {value.GetType()}");
+                else maximumLifeStatusIncreasedByHeight = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight not set");
+        }
+        { //maximumDamageStatusIncreasedByHeight
+            if (baseConfigs.TryGetValue("maximumDamageStatusIncreasedByHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight is not double is {value.GetType()}");
+                else maximumDamageStatusIncreasedByHeight = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight not set");
+        }
+        { //maximumLootStatusIncreasedByHeight
+            if (baseConfigs.TryGetValue("maximumLootStatusIncreasedByHeight", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight is not double is {value.GetType()}");
+                else maximumLootStatusIncreasedByHeight = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight not set");
+        }
         { //levelUPExperienceIncreaseEveryHeight
             if (baseConfigs.TryGetValue("levelUPExperienceIncreaseEveryHeight", out object value))
                 if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryHeight is null");
@@ -287,6 +319,27 @@ public static class Configuration
                 else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lootStatsIncreaseEveryDistance is not double is {value.GetType()}");
                 else lootStatsIncreaseEveryDistance = (double)value;
             else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryDistance not set");
+        }
+        { //maximumLifeStatusIncreasedByDistance
+            if (baseConfigs.TryGetValue("maximumLifeStatusIncreasedByDistance", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance is not double is {value.GetType()}");
+                else maximumLifeStatusIncreasedByDistance = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance not set");
+        }
+        { //maximumDamageStatusIncreasedByDistance
+            if (baseConfigs.TryGetValue("maximumDamageStatusIncreasedByDistance", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance is not double is {value.GetType()}");
+                else maximumDamageStatusIncreasedByDistance = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance not set");
+        }
+        { //maximumLootStatusIncreasedByDistance
+            if (baseConfigs.TryGetValue("maximumLootStatusIncreasedByDistance", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance is not double is {value.GetType()}");
+                else maximumLootStatusIncreasedByDistance = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance not set");
         }
         { //levelUPExperienceIncreaseEveryDistance
             if (baseConfigs.TryGetValue("levelUPExperienceIncreaseEveryDistance", out object value))
@@ -337,12 +390,40 @@ public static class Configuration
                 else lootStatsIncreaseEveryAge = (double)value;
             else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryAge not set");
         }
+        { //maximumLifeStatusIncreasedByAge
+            if (baseConfigs.TryGetValue("maximumLifeStatusIncreasedByAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge is not double is {value.GetType()}");
+                else maximumLifeStatusIncreasedByAge = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge not set");
+        }
+        { //maximumDamageStatusIncreasedByAge
+            if (baseConfigs.TryGetValue("maximumDamageStatusIncreasedByAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge is not double is {value.GetType()}");
+                else maximumDamageStatusIncreasedByAge = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge not set");
+        }
+        { //maximumLootStatusIncreasedByAge
+            if (baseConfigs.TryGetValue("maximumLootStatusIncreasedByAge", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByAge is null");
+                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLootStatusIncreasedByAge is not double is {value.GetType()}");
+                else maximumLootStatusIncreasedByAge = (double)value;
+            else Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByAge not set");
+        }
         { //levelUPExperienceIncreaseEveryAge
             if (baseConfigs.TryGetValue("levelUPExperienceIncreaseEveryAge", out object value))
                 if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is null");
                 else if (value is not double) Debug.Log($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is not double is {value.GetType()}");
                 else levelUPExperienceIncreaseEveryAge = (double)value;
             else Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge not set");
+        }
+        { //entitySpawnConditions
+            if (baseConfigs.TryGetValue("entitySpawnConditions", out object value))
+                if (value is null) Debug.Log("CONFIGURATION ERROR: entitySpawnConditions is null");
+                else if (value is not Newtonsoft.Json.Linq.JArray) Debug.Log($"CONFIGURATION ERROR: entitySpawnConditions is not List<object> is {value.GetType()}");
+                else entitySpawnConditions = (value as Newtonsoft.Json.Linq.JArray).ToObject<List<object>>();
+            else Debug.Log("CONFIGURATION ERROR: entitySpawnConditions not set");
         }
         { //enableExtendedLog
             if (baseConfigs.TryGetValue("enableExtendedLog", out object value))
