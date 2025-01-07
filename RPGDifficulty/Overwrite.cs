@@ -1,6 +1,5 @@
 using System;
 using HarmonyLib;
-using LevelUP;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
@@ -14,7 +13,7 @@ class Overwrite
 {
     public bool levelUPCompatibility = false;
     public Harmony instance;
-    public void OverwriteNativeFunctions(ICoreAPI api)
+    public void OverwriteNativeFunctions()
     {
         if (!Harmony.HasAnyPatches("rpgdifficulty"))
         {
@@ -49,11 +48,9 @@ class DamageInteraction
         #region health
         // Changing Health Stats
         EntityBehaviorHealth entityLifeStats = __instance.entity.GetBehavior<EntityBehaviorHealth>();
-        float oldBaseMaxHealth = 0f;
         // Check existance, for example buttlerfly doesn't have a life status
         if (entityLifeStats != null)
         {
-            oldBaseMaxHealth = entityLifeStats.BaseMaxHealth;
             double healthPercentage = 0;
             healthPercentage += __instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance");
             healthPercentage += __instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight");
@@ -73,7 +70,6 @@ class DamageInteraction
 
         #region damage
         float damage = taskConfig["damage"].AsFloat();
-        int damageTier = taskConfig["damageTier"].AsInt();
         if (damage == 0f) return;
 
         // Increase the damage
@@ -84,12 +80,6 @@ class DamageInteraction
         // Variation
         if (Configuration.enableStatusVariation)
             damage *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-
-        // Increase the damage tier
-        if (Configuration.increaseDamageTier)
-            for (int i = 0; i < damage; i++)
-                if (i % Configuration.damageTierIncreaseEveryDamage == 0)
-                    damageTier++;
 
         string data = taskConfig.Token?.ToString();
 
@@ -108,62 +98,11 @@ class DamageInteraction
 
         // Checking if damage exist
         if (jsonObject.TryGetValue("damage", out JToken _))
-        {
             // Redefining the damage
             jsonObject["damage"] = damage;
-            jsonObject["damageTier"] = damageTier;
-        }
 
         // Updating the json
         taskConfig = new(JToken.Parse(jsonObject.ToString()));
-        #endregion
-
-        #region rpgoverlay
-        if (Configuration.rpgOverlayOverwriteLevel)
-        {
-            int additionalLevels = 0;
-            bool reducedAdditionalLevels = false;
-            double healthDifference = entityLifeStats.BaseMaxHealth - oldBaseMaxHealth;
-            // Check if the health is less
-            if (healthDifference < 0)
-            {
-                healthDifference = Math.Abs(healthDifference);
-                reducedAdditionalLevels = true;
-            }
-
-            for (int i = 0; i < (int)healthDifference; i++)
-            {
-                // If i is multiply of rpgOverlayIncreaseLevelEveryAdditionalHP
-                if (i % Configuration.rpgOverlayIncreaseLevelEveryAdditionalHP == 0)
-                {
-                    // increasing the level
-                    additionalLevels++;
-                }
-            }
-
-            if (additionalLevels != 0)
-            {
-                // Transforms the additionaLevels in negative if is to be reduced
-                if (reducedAdditionalLevels)
-                {
-                    additionalLevels = -additionalLevels;
-                }
-
-                // Checking if not exist any compatibility yet
-                if (__instance.entity.WatchedAttributes.GetInt("RPGOverlayAddOrReduceLevels") == 0)
-                {
-                    // Simple create new level if not exist
-                    __instance.entity.WatchedAttributes.SetInt("RPGOverlayAddOrReduceLevels", additionalLevels);
-                }
-                else
-                {
-                    // Some other mod has already created the compatibility, lets get the value
-                    int previousAdditionalLevels = __instance.entity.WatchedAttributes.GetInt("RPGOverlayAddOrReduceLevels");
-                    // We set now the variable as the: previous level from other mod plus ours new level
-                    __instance.entity.WatchedAttributes.SetInt("RPGOverlayAddOrReduceLevels", additionalLevels + previousAdditionalLevels);
-                }
-            }
-        }
         #endregion
     }
 

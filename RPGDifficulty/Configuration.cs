@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
-using RPGDifficulty;
 using Vintagestory.API.Common;
 
-namespace LevelUP;
+namespace RPGDifficulty;
 
 #pragma warning disable CA2211
 public static class Configuration
@@ -95,12 +94,6 @@ public static class Configuration
     public static bool enableStatusVariation = true;
     public static double minimumVariableStatusAverage = 0.5;
     public static double maxVariableStatusAverage = 1.5;
-
-    public static bool increaseDamageTier = true;
-    public static int damageTierIncreaseEveryDamage = 5;
-
-    public static bool rpgOverlayOverwriteLevel = true;
-    public static int rpgOverlayIncreaseLevelEveryAdditionalHP = 3;
 
     public static int increaseStatsEveryDownHeight = 10;
     public static int baseStatusHeight = 60;
@@ -214,34 +207,6 @@ public static class Configuration
                 else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maxVariableStatusAverage is not double is {value.GetType()}");
                 else maxVariableStatusAverage = (double)value;
             else Debug.Log("CONFIGURATION ERROR: maxVariableStatusAverage not set");
-        }
-        { //increaseDamageTier
-            if (baseConfigs.TryGetValue("increaseDamageTier", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: increaseDamageTier is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: increaseDamageTier is not boolean is {value.GetType()}");
-                else increaseDamageTier = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: increaseDamageTier not set");
-        }
-        { //damageTierIncreaseEveryDamage
-            if (baseConfigs.TryGetValue("damageTierIncreaseEveryDamage", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: damageTierIncreaseEveryDamage is null");
-                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: damageTierIncreaseEveryDamage is not int is {value.GetType()}");
-                else damageTierIncreaseEveryDamage = (int)(long)value;
-            else Debug.Log("CONFIGURATION ERROR: damageTierIncreaseEveryDamage not set");
-        }
-        { //rpgOverlayOverwriteLevel
-            if (baseConfigs.TryGetValue("rpgOverlayOverwriteLevel", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: rpgOverlayOverwriteLevel is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: rpgOverlayOverwriteLevel is not boolean is {value.GetType()}");
-                else rpgOverlayOverwriteLevel = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: rpgOverlayOverwriteLevel not set");
-        }
-        { //rpgOverlayIncreaseLevelEveryAdditionalHP
-            if (baseConfigs.TryGetValue("rpgOverlayIncreaseLevelEveryAdditionalHP", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: rpgOverlayIncreaseLevelEveryAdditionalHP is null");
-                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: rpgOverlayIncreaseLevelEveryAdditionalHP is not int is {value.GetType()}");
-                else rpgOverlayIncreaseLevelEveryAdditionalHP = (int)(long)value;
-            else Debug.Log("CONFIGURATION ERROR: rpgOverlayIncreaseLevelEveryAdditionalHP not set");
         }
         { //damageStatsIncreaseEveryDistance
             if (baseConfigs.TryGetValue("damageStatsIncreaseEveryDistance", out object value))

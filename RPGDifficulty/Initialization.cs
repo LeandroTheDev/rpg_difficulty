@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using LevelUP;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Server;
-using Vintagestory.GameContent;
 namespace RPGDifficulty;
 
 public class Initialization : ModSystem
@@ -122,7 +119,7 @@ public class Initialization : ModSystem
         Debug.Log($"Running on Version: {Mod.Info.Version}");
 
         // Overwrite native functions
-        overwriter.OverwriteNativeFunctions(api);
+        overwriter.OverwriteNativeFunctions();
     }
 
     public override void AssetsLoaded(ICoreAPI api)
