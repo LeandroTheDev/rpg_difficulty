@@ -40,6 +40,8 @@ class DamageInteraction
     {
         if (__instance.entity == null) return;
         if (__instance.entity.Attributes == null) return;
+        if (__instance.entity.Attributes.GetBool("RPGDifficultyAlreadyDeployed")) return;
+        else __instance.entity.Attributes.SetBool("RPGDifficultyAlreadyDeployed", true);
 
         // Single player / Lan treatment
         if (__instance.entity.SidedProperties == null) return;
