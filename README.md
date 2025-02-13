@@ -33,7 +33,7 @@ By default the blacklist with "game:player" is enabled, because of course we don
 
 Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity creature spawn in the world.
 
-### About RPG Difficulty
+# About RPG Difficulty
 RPG Difficulty is open source project and can easily be accessed on the github, all contents from this mod is completly free.
 
 If you want to contribute into the project you can access the project github and make your pull request.
@@ -43,20 +43,12 @@ You are free to fork the project and make your own version of RPG Difficulty, as
 Inspirations: 
 - Minecraft RpgDifficulty mod
 
-### Building
-Learn more about vintage story modding in [Linux](https://github.com/LeandroTheDev/arch_linux/wiki/Games#vintage-story-modding) or [Windows](https://wiki.vintagestory.at/index.php/Modding:Setting_up_your_Development_Environment)
+# Building
+- Install .NET in your system, open terminal type: ``dotnet new install VintageStory.Mod.Templates``
+- Create a template with the name ``RPGDifficulty``: ``dotnet new vsmod --AddSolutionFile -o RPGDifficulty``
+- [Clone the repository](https://github.com/LeandroTheDev/rpg_difficulty/archive/refs/heads/main.zip)
+- Copy the ``CakeBuild`` and ``build.ps1`` or ``build.sh`` and paste inside the repository
 
-Download the mod template for vintage story with name RPGDifficulty and paste all contents from this project in there
-
-> Linux
-
-Make a symbolic link for fast tests
-- ln -s /path/to/project/Releases/rpgdifficulty/* /path/to/game/Mods/RPGDifficulty/
-
-Execute the comamnd ./build.sh, consider having setup everthing from vintage story ide before
-
-> Windows
-
-Just open the visual studio with RPGDifficulty.sln
+Now you can build using the ``build.ps1`` or ``build.sh`` file
 
 FTM License
