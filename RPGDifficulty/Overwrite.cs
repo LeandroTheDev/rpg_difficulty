@@ -7,6 +7,8 @@ using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.Server;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Vintagestory.API.Server;
 
 namespace RPGDifficulty;
 class Overwrite
@@ -42,13 +44,30 @@ class DamageInteraction
         if (__instance.entity.Attributes.GetBool("RPGDifficultyAlreadyDeployed")) return;
         else __instance.entity.Attributes.SetBool("RPGDifficultyAlreadyDeployed", true);
 
+        // Check if should spawn entity
+        if (!Initialization.ShouldEntitySpawn(__instance.entity))
+        {
+            if (Configuration.enableExtendedLog)
+                Debug.Log($"Entity removed by ShouldEntitySpawn: {__instance.entity.GetName()}");
+
+            Initialization.serverAPI?.World.DespawnEntity(__instance.entity, new()
+            {
+                Reason = EnumDespawnReason.Removed
+            });
+            return;
+        }
+
+        // Checking if the entity already have the calculation
+        if (!__instance.entity.Attributes.GetBool("RPGDifficultyAlreadySet"))
+            Initialization.SetEntityStats(__instance.entity);
+
         // Single player / Lan treatment
         if (__instance.entity.SidedProperties == null) return;
 
         #region health
         // Changing Health Stats
         EntityBehaviorHealth entityLifeStats = __instance.entity.GetBehavior<EntityBehaviorHealth>();
-        // Check existance, for example buttlerfly doesn't have a life status
+        // Check existance
         if (entityLifeStats != null)
         {
             double healthPercentage = 0;
@@ -65,6 +84,15 @@ class DamageInteraction
             entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
             if (Configuration.enableStatusVariation)
                 entityLifeStats.Health *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+
+            if (entityLifeStats.Health < 1)
+            {
+                Debug.Log("------------------------");
+                Debug.Log($"ERROR: Entity health calculations goes really wrong: {__instance.entity.GetName()}, ");
+                Debug.Log($"Distance: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
+                Debug.Log($"Height: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
+                Debug.Log($"Age: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+            }
         }
         #endregion
 
@@ -112,102 +140,16 @@ class DamageInteraction
     [HarmonyPatch(typeof(ServerMain), "SpawnEntity", [typeof(Entity), typeof(EntityProperties)])]
     public static bool SpawnEntity(Entity entity, EntityProperties type)
     {
+        if (!Initialization.ShouldEntitySpawn(entity))
+        {
+            if (Configuration.enableExtendedLog)
+                Debug.Log($"Entity removed by ShouldEntitySpawn: {entity.GetName()}");
+            return false;
+        }
+
         // Checking if the entity already have the calculation
         if (!entity.Attributes.GetBool("RPGDifficultyAlreadySet"))
             Initialization.SetEntityStats(entity);
-
-        // Swiping every condition
-        foreach (object conditionsObject in Configuration.entitySpawnConditions)
-        {
-            // Check if the condition is a valid object
-            if (conditionsObject is JObject conditions)
-            {
-                try
-                {
-                    Dictionary<string, object> conditionsDict = conditions.ToObject<Dictionary<string, object>>();
-
-                    // Check if the spawn condition is for this entity
-                    if (conditionsDict.TryGetValue("code", out object code))
-                        if (code.ToString() != entity.Code.ToString())
-                            continue;
-
-                    // Check SpawnersApi condition
-                    if (conditionsDict.TryGetValue("ignoreConditionsForSpawnersAPI", out object ignoreConditionsForSpawnersAPI))
-                        if (bool.Parse(ignoreConditionsForSpawnersAPI.ToString()) && entity.Attributes.GetBool("SpawnersAPI_Is_From_Spawner"))
-                            continue;
-
-                    // Getting the entity condition values
-                    double distance = entity.Attributes.GetDouble("RPGDifficultyEntitySpawnDistance", -1);
-                    double height = entity.Attributes.GetDouble("RPGDifficultyEntitySpawnHeight", -1);
-                    double age = entity.Attributes.GetDouble("RPGDifficultyEntitySpawnAge", -1);
-
-                    // Distance check
-                    if (conditionsDict.TryGetValue("minimumDistanceToSpawn", out object minimumDistanceToSpawn) &&
-                        conditionsDict.TryGetValue("maximumDistanceToSpawn", out object maximumDistanceToSpawn))
-                    {
-                        if ((long)minimumDistanceToSpawn != -1)
-                            if (distance < (long)minimumDistanceToSpawn)
-                            {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in minimum distance: {minimumDistanceToSpawn}, actual: {distance}");
-                                return false;
-                            }
-                        if ((long)maximumDistanceToSpawn != -1)
-                            if (distance > (long)maximumDistanceToSpawn)
-                            {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in maximum distance: {maximumDistanceToSpawn}, actual: {distance}");
-                                return false;
-                            }
-                    }
-
-                    // Height check
-                    if (conditionsDict.TryGetValue("minimumHeightToSpawn", out object minimumHeightToSpawn) &&
-                        conditionsDict.TryGetValue("maximumHeightToSpawn", out object maximumHeightToSpawn))
-                    {
-                        if ((long)minimumHeightToSpawn != -1)
-                            if (height < (long)minimumHeightToSpawn)
-                            {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in minimum height: {minimumHeightToSpawn}, actual: {height}");
-                                return false;
-                            }
-                        if ((long)maximumHeightToSpawn != -1)
-                            if (height > (long)maximumHeightToSpawn)
-                            {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in maximum height: {maximumHeightToSpawn}, actual: {height}");
-                                return false;
-                            }
-                    }
-
-                    // Age check
-                    if (conditionsDict.TryGetValue("minimumAgeToSpawn", out object minimumAgeToSpawn) &&
-                        conditionsDict.TryGetValue("maximumAgeToSpawn", out object maximumAgeToSpawn))
-                    {
-                        if ((long)minimumAgeToSpawn != -1)
-                            if (age < (long)minimumAgeToSpawn)
-                            {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in minimum age: {minimumAgeToSpawn}, actual: {age}");
-                                return false;
-                            }
-                        if ((long)maximumAgeToSpawn != -1)
-                            if (age > (long)maximumAgeToSpawn)
-                            {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in maximum age: {maximumAgeToSpawn}, actual: {age}");
-                                return false;
-                            }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.Log($"ERROR: Something crashed the spawn condition, probably some mistake in base.json \"entitySpawnConditions\", exception: {ex.Message}");
-                }
-            }
-            else Debug.Log($"ERROR: Spawn condition is not a JObject, it is {conditionsObject.GetType()}");
-        }
 
         return true;
     }
