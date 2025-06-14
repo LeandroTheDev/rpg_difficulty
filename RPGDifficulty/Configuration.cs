@@ -22,20 +22,20 @@ public static class Configuration
         }
         catch (DirectoryNotFoundException)
         {
-            Debug.Log($"WARNING: Server configurations directory does not exist creating {name}.json and directory...");
+            Debug.LogWarn($"WARNING: Server configurations directory does not exist creating {name}.json and directory...");
             try
             {
                 Directory.CreateDirectory(directoryPath);
             }
             catch (Exception ex)
             {
-                Debug.Log($"ERROR: Cannot create directory: {ex.Message}");
+                Debug.LogError($"ERROR: Cannot create directory: {ex.Message}");
             }
-            Debug.Log("Loading default configurations...");
+            Debug.LogWarn("Loading default configurations...");
             // Load default configurations
             loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
 
-            Debug.Log($"Configurations loaded, saving configs in: {configPath}");
+            Debug.LogError($"Configurations loaded, saving configs in: {configPath}");
             try
             {
                 // Saving default configurations
@@ -44,17 +44,17 @@ public static class Configuration
             }
             catch (Exception ex)
             {
-                Debug.Log($"ERROR: Cannot save default files to {configPath}, reason: {ex.Message}");
+                Debug.LogError($"ERROR: Cannot save default files to {configPath}, reason: {ex.Message}");
             }
         }
         catch (FileNotFoundException)
         {
-            Debug.Log($"WARNING: Server configurations {name}.json cannot be found, recreating file from default");
+            Debug.LogWarn($"WARNING: Server configurations {name}.json cannot be found, recreating file from default");
             Debug.Log("Loading default configurations...");
             // Load default configurations
             loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
 
-            Debug.Log($"Configurations loaded, saving configs in: {configPath}");
+            Debug.LogError($"Configurations loaded, saving configs in: {configPath}");
             try
             {
                 // Saving default configurations
@@ -63,13 +63,13 @@ public static class Configuration
             }
             catch (Exception ex)
             {
-                Debug.Log($"ERROR: Cannot save default files to {configPath}, reason: {ex.Message}");
+                Debug.LogError($"ERROR: Cannot save default files to {configPath}, reason: {ex.Message}");
             }
 
         }
         catch (Exception ex)
         {
-            Debug.Log($"ERROR: Cannot read the server configurations: {ex.Message}");
+            Debug.LogError($"ERROR: Cannot read the server configurations: {ex.Message}");
             Debug.Log("Loading default values from mod assets...");
             // Load default configurations
             loadedConfig = api.Assets.Get(new AssetLocation(defaultDirectory)).ToObject<Dictionary<string, object>>();
@@ -126,8 +126,6 @@ public static class Configuration
     public static double levelUPExperienceIncreaseEveryAge = 0.1;
 
     public static List<object> entitySpawnConditions = [];
-
-    public static int levelUPSecondsPositionUpdate = 1000;
     public static bool enableExtendedLog = true;
 
     public static void UpdateBaseConfigurations(ICoreAPI api)
@@ -140,262 +138,255 @@ public static class Configuration
         );
         { //enableWhitelist
             if (baseConfigs.TryGetValue("enableWhitelist", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: enableWhitelist is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableWhitelist is not boolean is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: enableWhitelist is null");
+                else if (value is not bool) Debug.LogError($"CONFIGURATION ERROR: enableWhitelist is not boolean is {value.GetType()}");
                 else enableWhitelist = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: enableWhitelist not set");
+            else Debug.LogError("CONFIGURATION ERROR: enableWhitelist not set");
         }
         { //enableBlacklist
             if (baseConfigs.TryGetValue("enableBlacklist", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: enableBlacklist is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableBlacklist is not boolean is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: enableBlacklist is null");
+                else if (value is not bool) Debug.LogError($"CONFIGURATION ERROR: enableBlacklist is not boolean is {value.GetType()}");
                 else enableBlacklist = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: enableBlacklist not set");
+            else Debug.LogError("CONFIGURATION ERROR: enableBlacklist not set");
         }
         { //enableStatusIncreaseByHeight
             if (baseConfigs.TryGetValue("enableStatusIncreaseByHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByHeight is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableStatusIncreaseByHeight is not boolean is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: enableStatusIncreaseByHeight is null");
+                else if (value is not bool) Debug.LogError($"CONFIGURATION ERROR: enableStatusIncreaseByHeight is not boolean is {value.GetType()}");
                 else enableStatusIncreaseByHeight = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: enableStatusIncreaseByHeight not set");
         }
         { //increaseStatsEveryDownHeight
             if (baseConfigs.TryGetValue("increaseStatsEveryDownHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: increaseStatsEveryDownHeight is null");
-                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: increaseStatsEveryDownHeight is not int is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: increaseStatsEveryDownHeight is null");
+                else if (value is not long) Debug.LogError($"CONFIGURATION ERROR: increaseStatsEveryDownHeight is not int is {value.GetType()}");
                 else increaseStatsEveryDownHeight = (int)(long)value;
-            else Debug.Log("CONFIGURATION ERROR: increaseStatsEveryDownHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: increaseStatsEveryDownHeight not set");
         }
         { //baseStatusHeight
             if (baseConfigs.TryGetValue("baseStatusHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: baseStatusHeight is null");
-                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: baseStatusHeight is not int is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: baseStatusHeight is null");
+                else if (value is not long) Debug.LogError($"CONFIGURATION ERROR: baseStatusHeight is not int is {value.GetType()}");
                 else baseStatusHeight = (int)(long)value;
-            else Debug.Log("CONFIGURATION ERROR: baseStatusHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: baseStatusHeight not set");
         }
         { //lifeStatsIncreaseEveryHeight
             if (baseConfigs.TryGetValue("lifeStatsIncreaseEveryHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight is not double is {value.GetType()}");
                 else lifeStatsIncreaseEveryHeight = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: lifeStatsIncreaseEveryHeight not set");
         }
         { //baseHarvest
             if (baseConfigs.TryGetValue("baseHarvest", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: baseHarvest is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: baseHarvest is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: baseHarvest is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: baseHarvest is not double is {value.GetType()}");
                 else baseHarvest = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: baseHarvest not set");
+            else Debug.LogError("CONFIGURATION ERROR: baseHarvest not set");
         }
         { //enableStatusVariation
             if (baseConfigs.TryGetValue("enableStatusVariation", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusVariation is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableStatusVariation is not boolean is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: enableStatusVariation is null");
+                else if (value is not bool) Debug.LogError($"CONFIGURATION ERROR: enableStatusVariation is not boolean is {value.GetType()}");
                 else enableStatusVariation = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: enableStatusVariation not set");
+            else Debug.LogError("CONFIGURATION ERROR: enableStatusVariation not set");
         }
         { //minimumVariableStatusAverage
             if (baseConfigs.TryGetValue("minimumVariableStatusAverage", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: minimumVariableStatusAverage is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: minimumVariableStatusAverage is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: minimumVariableStatusAverage is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: minimumVariableStatusAverage is not double is {value.GetType()}");
                 else minimumVariableStatusAverage = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: minimumVariableStatusAverage not set");
+            else Debug.LogError("CONFIGURATION ERROR: minimumVariableStatusAverage not set");
         }
         { //maxVariableStatusAverage
             if (baseConfigs.TryGetValue("maxVariableStatusAverage", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maxVariableStatusAverage is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maxVariableStatusAverage is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maxVariableStatusAverage is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maxVariableStatusAverage is not double is {value.GetType()}");
                 else maxVariableStatusAverage = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maxVariableStatusAverage not set");
+            else Debug.LogError("CONFIGURATION ERROR: maxVariableStatusAverage not set");
         }
         { //damageStatsIncreaseEveryDistance
             if (baseConfigs.TryGetValue("damageStatsIncreaseEveryDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is not double is {value.GetType()}");
                 else damageStatsIncreaseEveryDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
         }
         { //lootStatsIncreaseEveryHeight
             if (baseConfigs.TryGetValue("lootStatsIncreaseEveryHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryHeight is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lootStatsIncreaseEveryHeight is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: lootStatsIncreaseEveryHeight is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: lootStatsIncreaseEveryHeight is not double is {value.GetType()}");
                 else lootStatsIncreaseEveryHeight = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: lootStatsIncreaseEveryHeight not set");
         }
         { //maximumLifeStatusIncreasedByHeight
             if (baseConfigs.TryGetValue("maximumLifeStatusIncreasedByHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight is not double is {value.GetType()}");
                 else maximumLifeStatusIncreasedByHeight = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumLifeStatusIncreasedByHeight not set");
         }
         { //maximumDamageStatusIncreasedByHeight
             if (baseConfigs.TryGetValue("maximumDamageStatusIncreasedByHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight is not double is {value.GetType()}");
                 else maximumDamageStatusIncreasedByHeight = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumDamageStatusIncreasedByHeight not set");
         }
         { //maximumLootStatusIncreasedByHeight
             if (baseConfigs.TryGetValue("maximumLootStatusIncreasedByHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight is not double is {value.GetType()}");
                 else maximumLootStatusIncreasedByHeight = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumLootStatusIncreasedByHeight not set");
         }
         { //levelUPExperienceIncreaseEveryHeight
             if (baseConfigs.TryGetValue("levelUPExperienceIncreaseEveryHeight", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryHeight is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryHeight is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryHeight is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryHeight is not double is {value.GetType()}");
                 else levelUPExperienceIncreaseEveryHeight = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryHeight not set");
+            else Debug.LogError("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryHeight not set");
         }
         { //enableStatusIncreaseByDistance
             if (baseConfigs.TryGetValue("enableStatusIncreaseByDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByDistance is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableStatusIncreaseByDistance is not boolean is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: enableStatusIncreaseByDistance is null");
+                else if (value is not bool) Debug.LogError($"CONFIGURATION ERROR: enableStatusIncreaseByDistance is not boolean is {value.GetType()}");
                 else enableStatusIncreaseByDistance = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: enableStatusIncreaseByDistance not set");
         }
         { //increaseStatsEveryDistance
             if (baseConfigs.TryGetValue("increaseStatsEveryDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: increaseStatsEveryDistance is null");
-                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: increaseStatsEveryDistance is not int is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: increaseStatsEveryDistance is null");
+                else if (value is not long) Debug.LogError($"CONFIGURATION ERROR: increaseStatsEveryDistance is not int is {value.GetType()}");
                 else increaseStatsEveryDistance = (int)(long)value;
-            else Debug.Log("CONFIGURATION ERROR: increaseStatsEveryDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: increaseStatsEveryDistance not set");
         }
         { //lifeStatsIncreaseEveryDistance
             if (baseConfigs.TryGetValue("lifeStatsIncreaseEveryDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lifeStatsIncreaseEveryDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: lifeStatsIncreaseEveryDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: lifeStatsIncreaseEveryDistance is not double is {value.GetType()}");
                 else lifeStatsIncreaseEveryDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: lifeStatsIncreaseEveryDistance not set");
         }
         { //damageStatsIncreaseEveryDistance
             if (baseConfigs.TryGetValue("damageStatsIncreaseEveryDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: damageStatsIncreaseEveryDistance is not double is {value.GetType()}");
                 else damageStatsIncreaseEveryDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: damageStatsIncreaseEveryDistance not set");
         }
         { //lootStatsIncreaseEveryDistance
             if (baseConfigs.TryGetValue("lootStatsIncreaseEveryDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lootStatsIncreaseEveryDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: lootStatsIncreaseEveryDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: lootStatsIncreaseEveryDistance is not double is {value.GetType()}");
                 else lootStatsIncreaseEveryDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: lootStatsIncreaseEveryDistance not set");
         }
         { //maximumLifeStatusIncreasedByDistance
             if (baseConfigs.TryGetValue("maximumLifeStatusIncreasedByDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance is not double is {value.GetType()}");
                 else maximumLifeStatusIncreasedByDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumLifeStatusIncreasedByDistance not set");
         }
         { //maximumDamageStatusIncreasedByDistance
             if (baseConfigs.TryGetValue("maximumDamageStatusIncreasedByDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance is not double is {value.GetType()}");
                 else maximumDamageStatusIncreasedByDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumDamageStatusIncreasedByDistance not set");
         }
         { //maximumLootStatusIncreasedByDistance
             if (baseConfigs.TryGetValue("maximumLootStatusIncreasedByDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance is not double is {value.GetType()}");
                 else maximumLootStatusIncreasedByDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumLootStatusIncreasedByDistance not set");
         }
         { //levelUPExperienceIncreaseEveryDistance
             if (baseConfigs.TryGetValue("levelUPExperienceIncreaseEveryDistance", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance is not double is {value.GetType()}");
                 else levelUPExperienceIncreaseEveryDistance = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance not set");
-        }
-        { //levelUPSecondsPositionUpdate
-            if (baseConfigs.TryGetValue("levelUPSecondsPositionUpdate", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPSecondsPositionUpdate is null");
-                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: levelUPSecondsPositionUpdate is not int is {value.GetType()}");
-                else levelUPSecondsPositionUpdate = (int)(long)value;
-            else Debug.Log("CONFIGURATION ERROR: levelUPSecondsPositionUpdate not set");
+            else Debug.LogError("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryDistance not set");
         }
         { //enableStatusIncreaseByAge
             if (baseConfigs.TryGetValue("enableStatusIncreaseByAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByAge is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableStatusIncreaseByAge is not boolean is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: enableStatusIncreaseByAge is null");
+                else if (value is not bool) Debug.LogError($"CONFIGURATION ERROR: enableStatusIncreaseByAge is not boolean is {value.GetType()}");
                 else enableStatusIncreaseByAge = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: enableStatusIncreaseByAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: enableStatusIncreaseByAge not set");
         }
         { //increaseStatsEveryWorldDays
             if (baseConfigs.TryGetValue("increaseStatsEveryWorldDays", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: increaseStatsEveryWorldDays is null");
-                else if (value is not long) Debug.Log($"CONFIGURATION ERROR: increaseStatsEveryWorldDays is not int is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: increaseStatsEveryWorldDays is null");
+                else if (value is not long) Debug.LogError($"CONFIGURATION ERROR: increaseStatsEveryWorldDays is not int is {value.GetType()}");
                 else increaseStatsEveryWorldDays = (int)(long)value;
-            else Debug.Log("CONFIGURATION ERROR: increaseStatsEveryWorldDays not set");
+            else Debug.LogError("CONFIGURATION ERROR: increaseStatsEveryWorldDays not set");
         }
         { //lifeStatsIncreaseEveryAge
             if (baseConfigs.TryGetValue("lifeStatsIncreaseEveryAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryAge is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lifeStatsIncreaseEveryAge is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: lifeStatsIncreaseEveryAge is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: lifeStatsIncreaseEveryAge is not double is {value.GetType()}");
                 else lifeStatsIncreaseEveryAge = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: lifeStatsIncreaseEveryAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: lifeStatsIncreaseEveryAge not set");
         }
         { //damageStatsIncreaseEveryAge
             if (baseConfigs.TryGetValue("damageStatsIncreaseEveryAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryAge is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: damageStatsIncreaseEveryAge is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: damageStatsIncreaseEveryAge is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: damageStatsIncreaseEveryAge is not double is {value.GetType()}");
                 else damageStatsIncreaseEveryAge = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: damageStatsIncreaseEveryAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: damageStatsIncreaseEveryAge not set");
         }
         { //lootStatsIncreaseEveryAge
             if (baseConfigs.TryGetValue("lootStatsIncreaseEveryAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryAge is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: lootStatsIncreaseEveryAge is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: lootStatsIncreaseEveryAge is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: lootStatsIncreaseEveryAge is not double is {value.GetType()}");
                 else lootStatsIncreaseEveryAge = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: lootStatsIncreaseEveryAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: lootStatsIncreaseEveryAge not set");
         }
         { //maximumLifeStatusIncreasedByAge
             if (baseConfigs.TryGetValue("maximumLifeStatusIncreasedByAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge is not double is {value.GetType()}");
                 else maximumLifeStatusIncreasedByAge = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumLifeStatusIncreasedByAge not set");
         }
         { //maximumDamageStatusIncreasedByAge
             if (baseConfigs.TryGetValue("maximumDamageStatusIncreasedByAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge is not double is {value.GetType()}");
                 else maximumDamageStatusIncreasedByAge = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumDamageStatusIncreasedByAge not set");
         }
         { //maximumLootStatusIncreasedByAge
             if (baseConfigs.TryGetValue("maximumLootStatusIncreasedByAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByAge is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: maximumLootStatusIncreasedByAge is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: maximumLootStatusIncreasedByAge is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: maximumLootStatusIncreasedByAge is not double is {value.GetType()}");
                 else maximumLootStatusIncreasedByAge = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: maximumLootStatusIncreasedByAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: maximumLootStatusIncreasedByAge not set");
         }
         { //levelUPExperienceIncreaseEveryAge
             if (baseConfigs.TryGetValue("levelUPExperienceIncreaseEveryAge", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is null");
-                else if (value is not double) Debug.Log($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is not double is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is null");
+                else if (value is not double) Debug.LogError($"CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge is not double is {value.GetType()}");
                 else levelUPExperienceIncreaseEveryAge = (double)value;
-            else Debug.Log("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge not set");
+            else Debug.LogError("CONFIGURATION ERROR: levelUPExperienceIncreaseEveryAge not set");
         }
         { //entitySpawnConditions
             if (baseConfigs.TryGetValue("entitySpawnConditions", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: entitySpawnConditions is null");
-                else if (value is not Newtonsoft.Json.Linq.JArray) Debug.Log($"CONFIGURATION ERROR: entitySpawnConditions is not List<object> is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: entitySpawnConditions is null");
+                else if (value is not Newtonsoft.Json.Linq.JArray) Debug.LogError($"CONFIGURATION ERROR: entitySpawnConditions is not List<object> is {value.GetType()}");
                 else entitySpawnConditions = (value as Newtonsoft.Json.Linq.JArray).ToObject<List<object>>();
-            else Debug.Log("CONFIGURATION ERROR: entitySpawnConditions not set");
+            else Debug.LogError("CONFIGURATION ERROR: entitySpawnConditions not set");
         }
         { //enableExtendedLog
             if (baseConfigs.TryGetValue("enableExtendedLog", out object value))
-                if (value is null) Debug.Log("CONFIGURATION ERROR: enableExtendedLog is null");
-                else if (value is not bool) Debug.Log($"CONFIGURATION ERROR: enableExtendedLog is not boolean is {value.GetType()}");
+                if (value is null) Debug.LogError("CONFIGURATION ERROR: enableExtendedLog is null");
+                else if (value is not bool) Debug.LogError($"CONFIGURATION ERROR: enableExtendedLog is not boolean is {value.GetType()}");
                 else enableExtendedLog = (bool)value;
-            else Debug.Log("CONFIGURATION ERROR: enableExtendedLog not set");
+            else Debug.LogError("CONFIGURATION ERROR: enableExtendedLog not set");
         }
 
         // Get whitelistDistance
@@ -409,7 +400,7 @@ public static class Configuration
         foreach (KeyValuePair<string, object> pair in tmpwhitelistDistance)
         {
             if (pair.Value is double value) whitelistDistance.Add(pair.Key, (double)value);
-            else Debug.Log($"CONFIGURATION ERROR: whitelistDistance {pair.Key} is not double");
+            else Debug.LogError($"CONFIGURATION ERROR: whitelistDistance {pair.Key} is not double");
         }
 
         // Get blacklistDistance
@@ -423,7 +414,7 @@ public static class Configuration
         foreach (KeyValuePair<string, object> pair in tmpblacklistDistance)
         {
             if (pair.Value is double value) blacklistDistance.Add(pair.Key, (double)value);
-            else Debug.Log($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
+            else Debug.LogError($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
         }
 
         // Get whitelistHeight
@@ -437,7 +428,7 @@ public static class Configuration
         foreach (KeyValuePair<string, object> pair in tmpwhitelistHeight)
         {
             if (pair.Value is double value) whitelistHeight.Add(pair.Key, (double)value);
-            else Debug.Log($"CONFIGURATION ERROR: whitelistHeight {pair.Key} is not double");
+            else Debug.LogError($"CONFIGURATION ERROR: whitelistHeight {pair.Key} is not double");
         }
 
         // Get blacklistHeight
@@ -451,7 +442,7 @@ public static class Configuration
         foreach (KeyValuePair<string, object> pair in tmpblacklistHeight)
         {
             if (pair.Value is double value) blacklistHeight.Add(pair.Key, (double)value);
-            else Debug.Log($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
+            else Debug.LogError($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
         }
 
         // Get whitelistAge
@@ -465,7 +456,7 @@ public static class Configuration
         foreach (KeyValuePair<string, object> pair in tmpwhitelistAge)
         {
             if (pair.Value is double value) whitelistAge.Add(pair.Key, (double)value);
-            else Debug.Log($"CONFIGURATION ERROR: whitelistAge {pair.Key} is not double");
+            else Debug.LogError($"CONFIGURATION ERROR: whitelistAge {pair.Key} is not double");
         }
 
         // Get blacklistAge
@@ -479,7 +470,7 @@ public static class Configuration
         foreach (KeyValuePair<string, object> pair in tmpblacklistAge)
         {
             if (pair.Value is double value) blacklistAge.Add(pair.Key, (double)value);
-            else Debug.Log($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
+            else Debug.LogError($"CONFIGURATION ERROR: whitelist {pair.Key} is not double");
         }
     }
 
@@ -493,14 +484,14 @@ public static class Configuration
         // Blacklist Check
         if (enableBlacklist)
             if (blacklistDistance.TryGetValue(entityCode, out double _))
-            { if (enableExtendedLog) Debug.Log($"{entityCode} is on blacklist, ignoring stats distance"); return false; }
+            { Debug.LogDebug($"{entityCode} is on blacklist, ignoring stats distance"); return false; }
         // Whitelist Check
         if (enableWhitelist)
             // In whitelist
             if (whitelistDistance.TryGetValue(entityCode, out double _))
-            { if (enableExtendedLog) Debug.Log($"{entityCode} is on whitelist, increasing stats distance"); return true; }
+            { Debug.LogDebug($"{entityCode} is on whitelist, increasing stats distance"); return true; }
             // Not in whitelist
-            else { if (enableExtendedLog) Debug.Log($"{entityCode} is not on whitelist, ignoring stats distance"); return false; }
+            else { Debug.LogDebug($"{entityCode} is not on whitelist, ignoring stats distance"); return false; }
         // Check success 
         return true;
     }
@@ -512,14 +503,14 @@ public static class Configuration
         // Blacklist Check
         if (enableBlacklist)
             if (blacklistHeight.TryGetValue(entityCode, out double _))
-            { if (enableExtendedLog) Debug.Log($"{entityCode} is on blacklist, ignoring stats height"); return false; }
+            { Debug.LogDebug($"{entityCode} is on blacklist, ignoring stats height"); return false; }
         // Whitelist Check
         if (enableWhitelist)
             // In whitelist
             if (whitelistHeight.TryGetValue(entityCode, out double _))
-            { if (enableExtendedLog) Debug.Log($"{entityCode} is on whitelist, increasing stats height"); return true; }
+            { Debug.LogDebug($"{entityCode} is on whitelist, increasing stats height"); return true; }
             // Not in whitelist
-            else { if (enableExtendedLog) Debug.Log($"{entityCode} is not on whitelist, ignoring stats height"); return false; }
+            else { Debug.LogDebug($"{entityCode} is not on whitelist, ignoring stats height"); return false; }
         // Check success 
         return true;
     }
@@ -531,14 +522,14 @@ public static class Configuration
         // Blacklist Check
         if (enableBlacklist)
             if (blacklistAge.TryGetValue(entityCode, out double _))
-            { if (enableExtendedLog) Debug.Log($"{entityCode} is on blacklist, ignoring stats age"); return false; }
+            { Debug.LogDebug($"{entityCode} is on blacklist, ignoring stats age"); return false; }
         // Whitelist Check
         if (enableWhitelist)
             // In whitelist
             if (whitelistAge.TryGetValue(entityCode, out double _))
-            { if (enableExtendedLog) Debug.Log($"{entityCode} is on whitelist, increasing stats age"); return true; }
+            { Debug.LogDebug($"{entityCode} is on whitelist, increasing stats age"); return true; }
             // Not in whitelist
-            else { if (enableExtendedLog) Debug.Log($"{entityCode} is not on whitelist, ignoring stats age"); return false; }
+            else { Debug.LogDebug($"{entityCode} is not on whitelist, ignoring stats age"); return false; }
         // Check success 
         return true;
     }

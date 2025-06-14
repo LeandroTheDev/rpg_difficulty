@@ -6,14 +6,11 @@ using Vintagestory.GameContent;
 using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.Server;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Vintagestory.API.Server;
 
 namespace RPGDifficulty;
+
 class Overwrite
 {
-    public bool levelUPCompatibility = false;
     public Harmony instance;
     public void OverwriteNativeFunctions()
     {
@@ -47,8 +44,7 @@ class DamageInteraction
         // Check if should spawn entity
         if (!Initialization.ShouldEntitySpawn(__instance.entity))
         {
-            if (Configuration.enableExtendedLog)
-                Debug.Log($"Entity removed by ShouldEntitySpawn: {__instance.entity.GetName()}");
+            Debug.LogDebug($"Entity removed by ShouldEntitySpawn: {__instance.entity.GetName()}");
 
             Initialization.serverAPI?.World.DespawnEntity(__instance.entity, new()
             {
@@ -75,23 +71,27 @@ class DamageInteraction
             healthPercentage += __instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight");
             healthPercentage += __instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge");
 
-            entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * healthPercentage);
-            if (Configuration.enableStatusVariation)
-                entityLifeStats.BaseMaxHealth *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-            entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * healthPercentage);
-            if (Configuration.enableStatusVariation)
-                entityLifeStats.MaxHealth *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-            entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
-            if (Configuration.enableStatusVariation)
-                entityLifeStats.Health *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-
-            if (entityLifeStats.Health < 1)
+            if (healthPercentage > 0)
             {
-                Debug.Log("------------------------");
-                Debug.Log($"ERROR: Entity health calculations goes really wrong: {__instance.entity.GetName()}, ");
-                Debug.Log($"Distance: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
-                Debug.Log($"Height: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
-                Debug.Log($"Age: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+
+                entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * healthPercentage);
+                if (Configuration.enableStatusVariation)
+                    entityLifeStats.BaseMaxHealth *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * healthPercentage);
+                if (Configuration.enableStatusVariation)
+                    entityLifeStats.MaxHealth *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
+                if (Configuration.enableStatusVariation)
+                    entityLifeStats.Health *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+
+                if (entityLifeStats.Health < 1)
+                {
+                    Debug.LogError("------------------------");
+                    Debug.LogError($"ERROR: Entity health calculations goes really wrong: {__instance.entity.GetName()}, ");
+                    Debug.LogError($"Distance: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
+                    Debug.LogError($"Height: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
+                    Debug.LogError($"Age: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+                }
             }
         }
         #endregion
@@ -119,8 +119,7 @@ class DamageInteraction
         }
         catch (Exception ex)
         {
-            if (Configuration.enableExtendedLog)
-                Debug.Log($"Invalid json for entity: {__instance.entity.Code}, exception: {ex.Message}");
+            Debug.LogDebug($"Invalid json for entity: {__instance.entity.Code}, exception: {ex.Message}");
             return;
         }
 
@@ -142,8 +141,7 @@ class DamageInteraction
     {
         if (!Initialization.ShouldEntitySpawn(entity))
         {
-            if (Configuration.enableExtendedLog)
-                Debug.Log($"Entity removed by ShouldEntitySpawn: {entity.GetName()}");
+            Debug.LogDebug($"Entity removed by ShouldEntitySpawn: {entity.GetName()}");
             return false;
         }
 
@@ -172,7 +170,6 @@ class DamageInteraction
         if (Configuration.enableStatusVariation)
             dropQuantityMultiplier *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
-        if (Configuration.enableExtendedLog)
-            Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
+        Debug.LogDebug($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
     }
 }

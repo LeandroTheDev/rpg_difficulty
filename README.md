@@ -31,8 +31,6 @@ Make a backup of the world before adding this mod, any error can drastically inc
 ### Considerations
 By default the blacklist with "game:player" is enabled, because of course we dont wanna get the players to receive the buffs from distance when entering in the server, but if you want feel free to remove it.
 
-Adding lower values to the stats increase every... can cause performance problems in high numbers of status on low end cpus, this calculations is made every time a entity creature spawn in the world.
-
 # About RPG Difficulty
 RPG Difficulty is open source project and can easily be accessed on the github, all contents from this mod is completly free.
 
