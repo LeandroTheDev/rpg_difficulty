@@ -15,15 +15,12 @@ public class Initialization : ModSystem
     {
         base.StartServerSide(api);
         serverAPI = api;
+
         // Create the timer only with levelup compatibility
-        if (overwriter.levelUPCompatibility &&
-            Configuration.levelUPExperienceIncreaseEveryDistance != 0.0 &&
-            Configuration.levelUPExperienceIncreaseEveryHeight != 0.0)
+        if (api.ModLoader.IsModEnabled("levelup"))
         {
-            Debug.Log("Experience mechanic enabled, initializing LevelUP Compatibility");
-            api.Event.Timer(OnTimerElapsed, Configuration.levelUPSecondsPositionUpdate);
-            Debug.Log($"Updating player experience multiplier every {Configuration.levelUPSecondsPositionUpdate} second");
-            api.Event.PlayerDisconnect += PlayerDisconnectedLevelUP;
+            Debug.Log("LevelUP is enabled, registering 'OnExperienceIncrease' event");
+            LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnExperienceIncrease;
         }
 
         // Timer to get world spawn position
@@ -46,72 +43,57 @@ public class Initialization : ModSystem
         }
     }
 
-    private void PlayerDisconnectedLevelUP(IServerPlayer player)
+    private void LevelUPOnExperienceIncrease(IPlayer player, string type, ref ulong amount)
     {
-        player.Entity.Attributes.RemoveAttribute("LevelUP_Server_Instance_ExperienceMultiplier_IncreaseExp");
-    }
+        int statsIncreaseDistance = 0;
+        int statsIncreaseHeight = 0;
+        int statsIncreaseAge = 0;
 
-    private void OnTimerElapsed()
-    {
-        foreach (IPlayer player in serverAPI.World.AllOnlinePlayers)
+        // Stats increasing
         {
-            int statsIncreaseDistance = 0;
-            int statsIncreaseHeight = 0;
-            int statsIncreaseAge = 0;
-            // Stats increasing
+            // Coordinates
+            double entityX = player.Entity.Pos.X - serverAPI.World.DefaultSpawnPosition.X;
+            double entityZ = player.Entity.Pos.Z - serverAPI.World.DefaultSpawnPosition.Z;
+            double entityY = player.Entity.Pos.Y;
+
+            // XZ Coordinates translations
+            if (entityX < 0) entityX = Math.Abs(entityX);
+            if (entityZ < 0) entityZ = Math.Abs(entityZ);
+
+            // Distance calculation
+            if (Configuration.enableStatusIncreaseByDistance)
             {
-                // Coordinates
-                double entityX = player.Entity.Pos.X - serverAPI.World.DefaultSpawnPosition.X;
-                double entityZ = player.Entity.Pos.Z - serverAPI.World.DefaultSpawnPosition.Z;
-                double entityY = player.Entity.Pos.Y;
+                statsIncreaseDistance = (int)(Math.Floor(entityX / Configuration.increaseStatsEveryDistance) +
+                                              Math.Floor(entityZ / Configuration.increaseStatsEveryDistance));
+            }
 
-                // XZ Coordinates translations
-                if (entityX < 0) entityX = Math.Abs(entityX);
-                if (entityZ < 0) entityZ = Math.Abs(entityZ);
-
-                // Distance calculation
-                if (Configuration.enableStatusIncreaseByDistance)
+            // Height Calculation
+            if (Configuration.enableStatusIncreaseByHeight)
+            {
+                double heightDifference = Configuration.baseStatusHeight - entityY;
+                if (heightDifference > 0)
                 {
-                    while (true)
-                    {
-                        if (entityX <= Configuration.increaseStatsEveryDistance && entityZ <= Configuration.increaseStatsEveryDistance) break;
-
-                        // Reduce X
-                        if (entityX > Configuration.increaseStatsEveryDistance)
-                        {
-                            entityX -= Configuration.increaseStatsEveryDistance;
-                            statsIncreaseDistance++;
-                        }
-                        // Reduce Z
-                        if (entityZ > Configuration.increaseStatsEveryDistance)
-                        {
-                            entityZ -= Configuration.increaseStatsEveryDistance;
-                            statsIncreaseDistance++;
-                        }
-                    }
-                }
-
-                // Height Calculation
-                if (Configuration.enableStatusIncreaseByHeight)
-                {
-                    while (true)
-                    {
-                        if (entityY >= Configuration.baseStatusHeight || (entityY + Configuration.increaseStatsEveryDownHeight) >= Configuration.baseStatusHeight) break;
-
-                        entityY += Configuration.increaseStatsEveryDownHeight;
-                        statsIncreaseHeight++;
-                    }
-                }
-
-                // Age Calculation
-                if (Configuration.enableStatusIncreaseByAge)
-                {
-                    statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
+                    statsIncreaseHeight = (int)Math.Floor(heightDifference / Configuration.increaseStatsEveryDownHeight);
                 }
             }
-            // Set global experience for LevelUP compatibility layer
-            player.Entity.Attributes.SetFloat("LevelUP_Server_Instance_ExperienceMultiplier_IncreaseExp", (float)((Configuration.levelUPExperienceIncreaseEveryDistance * statsIncreaseDistance) + (Configuration.levelUPExperienceIncreaseEveryHeight * statsIncreaseHeight) + (Configuration.levelUPExperienceIncreaseEveryAge * statsIncreaseAge)));
+
+
+            // Age Calculation
+            if (Configuration.enableStatusIncreaseByAge)
+            {
+                statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
+            }
         }
+
+        Debug.LogDebug($"[EXPERIENCE] Before: {amount}");
+        // Increasing experience gain
+        amount += (ulong)Math.Round(amount *
+            (
+                (Configuration.levelUPExperienceIncreaseEveryDistance * statsIncreaseDistance) +
+                (Configuration.levelUPExperienceIncreaseEveryHeight * statsIncreaseHeight) +
+                (Configuration.levelUPExperienceIncreaseEveryAge * statsIncreaseAge)
+            ));
+        Debug.LogDebug($"[EXPERIENCE] After: {amount}");
     }
 
     public override void Start(ICoreAPI api)
@@ -132,7 +114,7 @@ public class Initialization : ModSystem
 
     public override double ExecuteOrder()
     {
-        return 0.5;
+        return 1.1;
     }
 
 
@@ -142,6 +124,7 @@ public class Initialization : ModSystem
         overwriter.instance?.UnpatchAll();
     }
 
+    private static readonly Random random = new();
     public static void SetEntityStats(Entity entity)
     {
         // Disclcaimer: for some reason the spawn position takes way too long to load, so in first loads we need to ignore it unfurtunally
@@ -162,7 +145,8 @@ public class Initialization : ModSystem
         {
             int statsIncreaseDistance = 0;
             int statsIncreaseHeight = 0;
-            int statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
+            int statsIncreaseAge = 0;
+
             // Stats increasing
             {
                 // Coordinates
@@ -181,35 +165,24 @@ public class Initialization : ModSystem
                 // Distance calculation
                 if (Configuration.enableStatusIncreaseByDistance)
                 {
-                    while (true)
-                    {
-                        if (entityX <= Configuration.increaseStatsEveryDistance && entityZ <= Configuration.increaseStatsEveryDistance) break;
-
-                        // Reduce X
-                        if (entityX > Configuration.increaseStatsEveryDistance)
-                        {
-                            entityX -= Configuration.increaseStatsEveryDistance;
-                            statsIncreaseDistance++;
-                        }
-                        // Reduce Z
-                        if (entityZ > Configuration.increaseStatsEveryDistance)
-                        {
-                            entityZ -= Configuration.increaseStatsEveryDistance;
-                            statsIncreaseDistance++;
-                        }
-                    }
+                    statsIncreaseDistance = (int)(Math.Floor(entityX / Configuration.increaseStatsEveryDistance) +
+                                                  Math.Floor(entityZ / Configuration.increaseStatsEveryDistance));
                 }
 
                 // Height Calculation
                 if (Configuration.enableStatusIncreaseByHeight)
                 {
-                    while (true)
+                    double heightDifference = Configuration.baseStatusHeight - entityY;
+                    if (heightDifference > 0)
                     {
-                        if (entityY >= Configuration.baseStatusHeight || (entityY + Configuration.increaseStatsEveryDownHeight) >= Configuration.baseStatusHeight) break;
-
-                        entityY += Configuration.increaseStatsEveryDownHeight;
-                        statsIncreaseHeight++;
+                        statsIncreaseHeight = (int)Math.Floor(heightDifference / Configuration.increaseStatsEveryDownHeight);
                     }
+                }
+
+                // Age Calculation
+                if (Configuration.enableStatusIncreaseByAge)
+                {
+                    statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
                 }
             }
 
@@ -220,7 +193,6 @@ public class Initialization : ModSystem
                 double variation = 0;
                 if (Configuration.enableStatusVariation)
                 {
-                    Random random = new();
                     variation = Configuration.minimumVariableStatusAverage + (Configuration.maxVariableStatusAverage - Configuration.minimumVariableStatusAverage) * random.NextDouble();
                     variation = Math.Round(variation, 2);
                     entity.Attributes.SetDouble("RPGDifficultyStatusVariation", variation);
@@ -286,8 +258,7 @@ public class Initialization : ModSystem
                 if (increaseByAge)
                     entity.Attributes.SetDouble("RPGDifficultyLootStatsIncreaseAge", lootAge);
 
-                if (Configuration.enableExtendedLog)
-                    Debug.Log($"{entity.Code} health percentage: {healthDistance + healthHeight + healthAge} damage percentage: {damageDistance + damageHeight + damageAge} loot percentage: {lootDistance + lootHeight + lootAge}, variation: {variation}");
+                Debug.LogDebug($"{entity.Code} health percentage: {healthDistance + healthHeight + healthAge} damage percentage: {damageDistance + damageHeight + damageAge} loot percentage: {lootDistance + lootHeight + lootAge}, variation: {variation}");
             }
         }
 
@@ -330,15 +301,13 @@ public class Initialization : ModSystem
                         if ((long)minimumDistanceToSpawn != -1)
                             if (distance < (long)minimumDistanceToSpawn)
                             {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in minimum distance: {minimumDistanceToSpawn}, actual: {distance}");
+                                Debug.LogDebug($"not in minimum distance: {minimumDistanceToSpawn}, actual: {distance}");
                                 return false;
                             }
                         if ((long)maximumDistanceToSpawn != -1)
                             if (distance > (long)maximumDistanceToSpawn)
                             {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in maximum distance: {maximumDistanceToSpawn}, actual: {distance}");
+                                Debug.LogDebug($"not in maximum distance: {maximumDistanceToSpawn}, actual: {distance}");
                                 return false;
                             }
                     }
@@ -350,15 +319,13 @@ public class Initialization : ModSystem
                         if ((long)minimumHeightToSpawn != -1)
                             if (height < (long)minimumHeightToSpawn)
                             {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in minimum height: {minimumHeightToSpawn}, actual: {height}");
+                                Debug.LogDebug($"not in minimum height: {minimumHeightToSpawn}, actual: {height}");
                                 return false;
                             }
                         if ((long)maximumHeightToSpawn != -1)
                             if (height > (long)maximumHeightToSpawn)
                             {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in maximum height: {maximumHeightToSpawn}, actual: {height}");
+                                Debug.LogDebug($"not in maximum height: {maximumHeightToSpawn}, actual: {height}");
                                 return false;
                             }
                     }
@@ -370,25 +337,23 @@ public class Initialization : ModSystem
                         if ((long)minimumAgeToSpawn != -1)
                             if (age < (long)minimumAgeToSpawn)
                             {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in minimum age: {minimumAgeToSpawn}, actual: {age}");
+                                Debug.LogDebug($"not in minimum age: {minimumAgeToSpawn}, actual: {age}");
                                 return false;
                             }
                         if ((long)maximumAgeToSpawn != -1)
                             if (age > (long)maximumAgeToSpawn)
                             {
-                                if (Configuration.enableExtendedLog)
-                                    Debug.Log($"not in maximum age: {maximumAgeToSpawn}, actual: {age}");
+                                Debug.LogDebug($"not in maximum age: {maximumAgeToSpawn}, actual: {age}");
                                 return false;
                             }
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log($"ERROR: Something crashed the spawn condition, probably some mistake in base.json \"entitySpawnConditions\", exception: {ex.Message}");
+                    Debug.LogError($"ERROR: Something crashed the spawn condition, probably some mistake in base.json \"entitySpawnConditions\", exception: {ex.Message}");
                 }
             }
-            else Debug.Log($"ERROR: Spawn condition is not a JObject, it is {conditionsObject.GetType()}");
+            else Debug.LogError($"ERROR: Spawn condition is not a JObject, it is {conditionsObject.GetType()}");
         }
         return true;
     }
@@ -396,18 +361,24 @@ public class Initialization : ModSystem
 
 public class Debug
 {
-    private static readonly OperatingSystem system = Environment.OSVersion;
-    static private ILogger loggerForNonTerminalUsers;
+    static private ILogger logger;
 
-    static public void LoadLogger(ILogger logger) => loggerForNonTerminalUsers = logger;
+    static public void LoadLogger(ILogger _logger) => logger = _logger;
     static public void Log(string message)
     {
-        // Check if is linux or other based system and if the terminal is active for the logs to be show
-        if (system.Platform == PlatformID.Unix || system.Platform == PlatformID.Other || Environment.UserInteractive)
-            // Based terminal users
-            Console.WriteLine($"{DateTime.Now:d.M.yyyy HH:mm:ss} [RPGDifficulty] {message}");
-        else
-            // Unbased non terminal users
-            loggerForNonTerminalUsers?.Log(EnumLogType.Notification, $"[RPGDifficulty] {message}");
+        logger?.Log(EnumLogType.Notification, $"[RPGDifficulty] {message}");
+    }
+    static public void LogDebug(string message)
+    {
+        if (Configuration.enableExtendedLog)
+            logger?.Log(EnumLogType.Debug, $"[RPGDifficulty] {message}");
+    }
+    static public void LogWarn(string message)
+    {
+        logger?.Log(EnumLogType.Warning, $"[RPGDifficulty] {message}");
+    }
+    static public void LogError(string message)
+    {
+        logger?.Log(EnumLogType.Error, $"[RPGDifficulty] {message}");
     }
 }
