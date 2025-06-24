@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
@@ -19,8 +21,11 @@ public class Initialization : ModSystem
         // Create the timer only with levelup compatibility
         if (api.ModLoader.IsModEnabled("levelup"))
         {
-            Debug.Log("LevelUP is enabled, registering 'OnExperienceIncrease' event");
-            LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnExperienceIncrease;
+            Task.Run(() =>
+            {
+                Debug.Log("LevelUP is enabled, registering 'OnExperienceIncrease' event");
+                LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnExperienceIncrease;
+            });
         }
 
         // Timer to get world spawn position
@@ -43,7 +48,7 @@ public class Initialization : ModSystem
         }
     }
 
-    private void LevelUPOnExperienceIncrease(IPlayer player, string type, ref ulong amount)
+    private static void LevelUPOnExperienceIncrease(IPlayer player, string type, ref ulong amount)
     {
         int statsIncreaseDistance = 0;
         int statsIncreaseHeight = 0;
