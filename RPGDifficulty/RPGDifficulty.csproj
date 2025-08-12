@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <OutputPath>bin\$(Configuration)\Mods\mod</OutputPath>
     <LangVersion>12.0</LangVersion>
@@ -25,7 +25,7 @@
   <!-- Also delete the lines for levelup compatibility -->
   <ItemGroup>
     <Reference Include="LevelUP">
-      <HintPath>$(VINTAGE_STORY)/Mods/levelup/LevelUP.dll</HintPath>
+      <HintPath>$(VINTAGE_STORY_MODS)/levelup/LevelUP.dll</HintPath>
       <Private>false</Private>
     </Reference>
   </ItemGroup>
