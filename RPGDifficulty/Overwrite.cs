@@ -6,6 +6,7 @@ using Vintagestory.GameContent;
 using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.Server;
+using System.Reflection;
 
 namespace RPGDifficulty;
 
@@ -32,23 +33,17 @@ class Overwrite
 class DamageInteraction
 {
     // Overwrite Damage Interaction
-    [HarmonyPatch(typeof(AiTaskMeleeAttack))]
-    [HarmonyPatch(MethodType.Constructor)]
-    [HarmonyPatch(new Type[] { typeof(EntityAgent), typeof(JsonObject), typeof(JsonObject) })]
-    [HarmonyPrefix]
-    public static void LoadConfig(AiTaskMeleeAttack __instance, EntityAgent entity, ref JsonObject taskConfig, JsonObject aiConfig)
+    [HarmonyPatch(typeof(AiTaskMeleeAttack), MethodType.Constructor, [typeof(EntityAgent), typeof(JsonObject), typeof(JsonObject)])]
+    [HarmonyPostfix]
+    [HarmonyPriority(Priority.VeryHigh)]
+    public static void LoadConfig(AiTaskMeleeAttack __instance, EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig)
     {
-        if (__instance.entity == null) return;
-        if (__instance.entity.Attributes == null) return;
-        if (__instance.entity.Attributes.GetBool("RPGDifficultyAlreadyDeployed")) return;
-        else __instance.entity.Attributes.SetBool("RPGDifficultyAlreadyDeployed", true);
-
         // Check if should spawn entity
-        if (!Initialization.ShouldEntitySpawn(__instance.entity))
+        if (!Initialization.ShouldEntitySpawn(entity))
         {
-            Debug.LogDebug($"Entity removed by ShouldEntitySpawn: {__instance.entity.GetName()}");
+            Debug.LogDebug($"Entity removed by ShouldEntitySpawn: {entity.GetName()}");
 
-            Initialization.serverAPI?.World.DespawnEntity(__instance.entity, new()
+            Initialization.serverAPI?.World.DespawnEntity(entity, new()
             {
                 Reason = EnumDespawnReason.Removed
             });
@@ -56,82 +51,72 @@ class DamageInteraction
         }
 
         // Checking if the entity already have the calculation
-        if (!__instance.entity.Attributes.GetBool("RPGDifficultyAlreadySet"))
-            Initialization.SetEntityStats(__instance.entity);
+        if (!entity.Attributes.GetBool("RPGDifficultyAlreadySet"))
+        {
+            Debug.LogDebug($"Calculating entity status: {entity.Code}");
+            Initialization.SetEntityStats(entity);
+        }
 
         // Single player / Lan treatment
-        if (__instance.entity.SidedProperties == null) return;
+        if (entity.SidedProperties == null) return;
 
         #region health
         // Changing Health Stats
-        EntityBehaviorHealth entityLifeStats = __instance.entity.GetBehavior<EntityBehaviorHealth>();
+        EntityBehaviorHealth entityLifeStats = entity.GetBehavior<EntityBehaviorHealth>();
         // Check existance
         if (entityLifeStats != null)
         {
             double healthPercentage = 0;
-            healthPercentage += __instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance");
-            healthPercentage += __instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight");
-            healthPercentage += __instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge");
+            healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance");
+            healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight");
+            healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge");
 
             if (healthPercentage > 0)
             {
 
                 entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * healthPercentage);
                 if (Configuration.enableStatusVariation)
-                    entityLifeStats.BaseMaxHealth *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                    entityLifeStats.BaseMaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
                 entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * healthPercentage);
                 if (Configuration.enableStatusVariation)
-                    entityLifeStats.MaxHealth *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                    entityLifeStats.MaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
                 entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
                 if (Configuration.enableStatusVariation)
-                    entityLifeStats.Health *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                    entityLifeStats.Health *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
                 if (entityLifeStats.Health < 1)
                 {
                     Debug.LogError("------------------------");
-                    Debug.LogError($"ERROR: Entity health calculations goes really wrong: {__instance.entity.GetName()}, ");
-                    Debug.LogError($"Distance: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
-                    Debug.LogError($"Height: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
-                    Debug.LogError($"Age: {__instance.entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+                    Debug.LogError($"ERROR: Entity health calculations goes really wrong: {entity.GetName()}, ");
+                    Debug.LogError($"Distance: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
+                    Debug.LogError($"Height: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
+                    Debug.LogError($"Age: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+                }
+                else
+                {
+                    Debug.LogDebug($"[LoadConfig] Entity health updated to: {entityLifeStats.MaxHealth}");
                 }
             }
         }
         #endregion
 
         #region damage
-        float damage = taskConfig["damage"].AsFloat();
+        float damage = taskConfig["damage"].AsFloat(2f);
         if (damage == 0f) return;
 
         // Increase the damage
-        damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
-        damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
-        damage += (float)(damage * __instance.entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
+        damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
+        damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+        damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
 
         // Variation
         if (Configuration.enableStatusVariation)
-            damage *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+            damage *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
-        string data = taskConfig.Token?.ToString();
+        FieldInfo protectedDamage = AccessTools.Field(typeof(AiTaskMeleeAttack), "damage");
+        protectedDamage.SetValue(__instance, damage);
 
-        // Parsing the readonly object into editable object
-        JObject jsonObject;
-        try
-        {
-            jsonObject = JObject.Parse(data);
-        }
-        catch (Exception ex)
-        {
-            Debug.LogDebug($"Invalid json for entity: {__instance.entity.Code}, exception: {ex.Message}");
-            return;
-        }
-
-        // Checking if damage exist
-        if (jsonObject.TryGetValue("damage", out JToken _))
-            // Redefining the damage
-            jsonObject["damage"] = damage;
-
-        // Updating the json
-        taskConfig = new(JToken.Parse(jsonObject.ToString()));
+        Debug.LogDebug($"[LoadConfig] Entity damage updated to: {protectedDamage.GetValue(__instance)}");
         #endregion
     }
 
