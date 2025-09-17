@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.Server;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace RPGDifficulty;
 
@@ -38,6 +39,8 @@ class DamageInteraction
     [HarmonyPriority(Priority.VeryHigh)]
     public static void LoadConfig(AiTaskMeleeAttack __instance, EntityAgent entity, JsonObject taskConfig, JsonObject aiConfig)
     {
+        if (!entity.Alive) return;
+
         // Check if should spawn entity
         if (!Initialization.ShouldEntitySpawn(entity))
         {
@@ -61,40 +64,96 @@ class DamageInteraction
         if (entity.SidedProperties == null) return;
 
         #region health
-        // Changing Health Stats
-        EntityBehaviorHealth entityLifeStats = entity.GetBehavior<EntityBehaviorHealth>();
-        // Check existance
-        if (entityLifeStats != null)
+        if (!entity.Attributes.GetBool("RPGDifficultyHealthAlreadySet"))
         {
-            double healthPercentage = 0;
-            healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance");
-            healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight");
-            healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge");
+            EntityBehaviorHealth entityLifeStats = entity.GetBehavior<EntityBehaviorHealth>();
 
-            if (healthPercentage > 0)
+            void updateEntityHealth()
             {
-
-                entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * healthPercentage);
-                if (Configuration.enableStatusVariation)
-                    entityLifeStats.BaseMaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-                entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * healthPercentage);
-                if (Configuration.enableStatusVariation)
-                    entityLifeStats.MaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-                entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
-                if (Configuration.enableStatusVariation)
-                    entityLifeStats.Health *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-
-                if (entityLifeStats.Health < 1)
+                double healthPercentage = 0;
+                healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance");
+                healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight");
+                healthPercentage += entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge");
+                if (healthPercentage > 0)
                 {
-                    Debug.LogError("------------------------");
-                    Debug.LogError($"ERROR: Entity health calculations goes really wrong: {entity.GetName()}, ");
-                    Debug.LogError($"Distance: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
-                    Debug.LogError($"Height: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
-                    Debug.LogError($"Age: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+
+                    float oldBaseMaxHealth = entityLifeStats.BaseMaxHealth;
+                    float oldMaxHealth = entityLifeStats.MaxHealth;
+                    float oldHealth = entityLifeStats.Health;
+
+                    entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * healthPercentage);
+                    if (Configuration.enableStatusVariation)
+                        entityLifeStats.BaseMaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                    entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * healthPercentage);
+                    if (Configuration.enableStatusVariation)
+                        entityLifeStats.MaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                    entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
+                    if (Configuration.enableStatusVariation)
+                        entityLifeStats.Health *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+
+                    if (entityLifeStats.Health < 1)
+                    {
+                        Debug.LogError("------------------------");
+                        Debug.LogError($"ERROR: Entity health calculations goes really wrong: {entity.GetName()}, ");
+                        Debug.LogError($"Distance: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
+                        Debug.LogError($"Height: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
+                        Debug.LogError($"Age: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+                        Debug.LogError($"Health Percentage: {healthPercentage}");
+                        Debug.LogError($"Base Max Health: {entityLifeStats.BaseMaxHealth}");
+                        Debug.LogError($"Max Health: {entityLifeStats.MaxHealth}");
+                        Debug.LogError($"Health: {entityLifeStats.Health}");
+                        Debug.LogError($"Old Base Max Health: {oldBaseMaxHealth}");
+                        Debug.LogError($"Old Max Health: {oldMaxHealth}");
+                        Debug.LogError($"Old Health: {oldHealth}");
+                    }
+                    else
+                    {
+                        Debug.LogDebug($"[LoadConfig] {entity.Code} health updated to: {entityLifeStats.MaxHealth}");
+                        // Health status can only be set once, otherwise will be updated every world start or entity reload
+                        entity.Attributes.SetBool("RPGDifficultyHealthAlreadySet", true);
+                    }
+                }
+            }
+
+            // Check existance
+            if (entityLifeStats != null)
+            {
+                if (
+                    entityLifeStats.BaseMaxHealth > 0f &&
+                    entityLifeStats.MaxHealth > 0f &&
+                    entityLifeStats.Health > 0f
+                )
+                {
+                    updateEntityHealth();
                 }
                 else
                 {
-                    Debug.LogDebug($"[LoadConfig] Entity health updated to: {entityLifeStats.MaxHealth}");
+                    // Entity health is not set yet for some reason, we wait it...
+                    Task.Run(async () =>
+                    {
+                        // Changing Health Stats
+                        EntityBehaviorHealth entityLifeStats = entity.GetBehavior<EntityBehaviorHealth>();
+
+                        for (int i = 0; i < 5; i++)
+                        {
+                            await Task.Delay(500);
+
+                            if (
+                                entityLifeStats.BaseMaxHealth > 0f &&
+                                entityLifeStats.MaxHealth > 0f &&
+                                entityLifeStats.Health > 0f
+                            )
+                            {
+                                updateEntityHealth();
+                                break;
+                            }
+
+                            if (i == 4)
+                            {
+                                Debug.LogError($"Could not setup entity health after 5 tries: {entity.GetName()}");
+                            }
+                        }
+                    });
                 }
             }
         }
@@ -102,21 +161,23 @@ class DamageInteraction
 
         #region damage
         float damage = taskConfig["damage"].AsFloat(2f);
-        if (damage == 0f) return;
+        if (damage >= 0f)
+        {
 
-        // Increase the damage
-        damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
-        damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
-        damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
+            // Increase the damage
+            damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseDistance"));
+            damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseHeight"));
+            damage += (float)(damage * entity.Attributes.GetDouble("RPGDifficultyDamageStatsIncreaseAge"));
 
-        // Variation
-        if (Configuration.enableStatusVariation)
-            damage *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+            // Variation
+            if (Configuration.enableStatusVariation)
+                damage *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
-        FieldInfo protectedDamage = AccessTools.Field(typeof(AiTaskMeleeAttack), "damage");
-        protectedDamage.SetValue(__instance, damage);
+            FieldInfo protectedDamage = AccessTools.Field(typeof(AiTaskMeleeAttack), "damage");
+            protectedDamage.SetValue(__instance, damage);
 
-        Debug.LogDebug($"[LoadConfig] Entity damage updated to: {protectedDamage.GetValue(__instance)}");
+            Debug.LogDebug($"[LoadConfig] Entity damage updated to: {protectedDamage.GetValue(__instance)}");
+        }
         #endregion
     }
 
