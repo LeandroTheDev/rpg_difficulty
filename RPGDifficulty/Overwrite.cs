@@ -81,36 +81,39 @@ class DamageInteraction
                     float oldMaxHealth = entityLifeStats.MaxHealth;
                     float oldHealth = entityLifeStats.Health;
 
-                    entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * healthPercentage);
-                    if (Configuration.enableStatusVariation)
-                        entityLifeStats.BaseMaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-                    entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * healthPercentage);
-                    if (Configuration.enableStatusVariation)
-                        entityLifeStats.MaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-                    entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
-                    if (Configuration.enableStatusVariation)
-                        entityLifeStats.Health *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                    if (oldBaseMaxHealth > 1 && oldMaxHealth > 1 && oldHealth > 1)
+                    {
+                        entityLifeStats.BaseMaxHealth += (int)Math.Round(entityLifeStats.BaseMaxHealth * healthPercentage);
+                        if (Configuration.enableStatusVariation)
+                            entityLifeStats.BaseMaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                        entityLifeStats.MaxHealth += (int)Math.Round(entityLifeStats.MaxHealth * healthPercentage);
+                        if (Configuration.enableStatusVariation)
+                            entityLifeStats.MaxHealth *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+                        entityLifeStats.Health += (int)Math.Round(entityLifeStats.Health * healthPercentage);
+                        if (Configuration.enableStatusVariation)
+                            entityLifeStats.Health *= (float)entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
-                    if (entityLifeStats.Health < 1)
-                    {
-                        Debug.LogError("------------------------");
-                        Debug.LogError($"ERROR: Entity health calculations goes really wrong: {entity.GetName()}, ");
-                        Debug.LogError($"Distance: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
-                        Debug.LogError($"Height: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
-                        Debug.LogError($"Age: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
-                        Debug.LogError($"Health Percentage: {healthPercentage}");
-                        Debug.LogError($"Base Max Health: {entityLifeStats.BaseMaxHealth}");
-                        Debug.LogError($"Max Health: {entityLifeStats.MaxHealth}");
-                        Debug.LogError($"Health: {entityLifeStats.Health}");
-                        Debug.LogError($"Old Base Max Health: {oldBaseMaxHealth}");
-                        Debug.LogError($"Old Max Health: {oldMaxHealth}");
-                        Debug.LogError($"Old Health: {oldHealth}");
-                    }
-                    else
-                    {
-                        Debug.LogDebug($"[LoadConfig] {entity.Code} health updated to: {entityLifeStats.MaxHealth}");
-                        // Health status can only be set once, otherwise will be updated every world start or entity reload
-                        entity.Attributes.SetBool("RPGDifficultyHealthAlreadySet", true);
+                        if (entityLifeStats.Health < 1)
+                        {
+                            Debug.LogError("------------------------");
+                            Debug.LogError($"ERROR: Entity health calculations goes really wrong: {entity.GetName()}, ");
+                            Debug.LogError($"Distance: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseDistance")}");
+                            Debug.LogError($"Height: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseHeight")}");
+                            Debug.LogError($"Age: {entity.Attributes.GetDouble("RPGDifficultyHealthStatsIncreaseAge")}");
+                            Debug.LogError($"Health Percentage: {healthPercentage}");
+                            Debug.LogError($"Base Max Health: {entityLifeStats.BaseMaxHealth}");
+                            Debug.LogError($"Max Health: {entityLifeStats.MaxHealth}");
+                            Debug.LogError($"Health: {entityLifeStats.Health}");
+                            Debug.LogError($"Old Base Max Health: {oldBaseMaxHealth}");
+                            Debug.LogError($"Old Max Health: {oldMaxHealth}");
+                            Debug.LogError($"Old Health: {oldHealth}");
+                        }
+                        else
+                        {
+                            Debug.LogDebug($"[LoadConfig] {entity.Code} health updated to: {entityLifeStats.MaxHealth}");
+                            // Health status can only be set once, otherwise will be updated every world start or entity reload
+                            entity.Attributes.SetBool("RPGDifficultyHealthAlreadySet", true);
+                        }
                     }
                 }
             }
@@ -202,22 +205,20 @@ class DamageInteraction
 
     // Overwrite Knife Harvesting
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(EntityBehaviorHarvestable), "SetHarvested")]
-    public static void SetHarvestedKnifeStart(EntityBehaviorHarvestable __instance, IPlayer byPlayer, ref float dropQuantityMultiplier)
+    [HarmonyPatch(typeof(EntityBehaviorHarvestable), "GenerateDrops")]
+    public static void GenerateDropsStart(EntityBehaviorHarvestable __instance, IPlayer byPlayer)
     {
         // Check if player exist and options is enabled
         if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
+        if (__instance.entity.WatchedAttributes.GetBool("harvested")) return;
 
         // Get the final droprate
         float dropRate = (float)Configuration.baseHarvest + (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance");
         dropRate += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
         dropRate += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseAge");
+        
+        // Rewrite this 1.21 removed the reference
 
-        dropQuantityMultiplier += dropRate;
-
-        if (Configuration.enableStatusVariation)
-            dropQuantityMultiplier *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
-
-        Debug.LogDebug($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
+        Debug.Log($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
     }
 }
