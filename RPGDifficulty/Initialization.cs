@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using HarmonyLib;
 using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.API.Server;
+using Vintagestory.GameContent;
 namespace RPGDifficulty;
 
 public class Initialization : ModSystem
@@ -25,6 +27,7 @@ public class Initialization : ModSystem
             {
                 Debug.Log("LevelUP is enabled, registering 'OnExperienceIncrease' event");
                 LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnExperienceIncrease;
+                LevelUP.Shared.OverwriteBlockInteractionEvents.OnKnifeHarvested += OnKnifeHarvested;
             });
         }
 
@@ -46,6 +49,24 @@ public class Initialization : ModSystem
                 catch (Exception) { }
             };
         }
+    }
+
+    private static void OnKnifeHarvested(IPlayer byPlayer, Entity harvestedEntity, ref float number)
+    {
+        // Check if player exist and options is enabled
+        if (byPlayer == null || (Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0 && Configuration.lootStatsIncreaseEveryAge == 0)) return;
+
+        // Get the final droprate
+        float dropRate = (float)Configuration.baseHarvest + (float)harvestedEntity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance");
+        dropRate += (float)harvestedEntity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
+        dropRate += (float)harvestedEntity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseAge");
+
+        if (Configuration.enableStatusVariation)
+            dropRate *= (float)harvestedEntity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+
+        number += dropRate;
+
+        Debug.LogDebug($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {number}");
     }
 
     private static void LevelUPOnExperienceIncrease(IPlayer player, string type, ref ulong amount)
@@ -109,6 +130,17 @@ public class Initialization : ModSystem
 
         // Overwrite native functions
         overwriter.OverwriteNativeFunctions();
+        // Disable GenerateDrops patch, because levelup already overwrite it
+        if (api.ModLoader.IsModEnabled("levelup"))
+        {
+            MethodInfo target = AccessTools.Method(typeof(EntityBehaviorHarvestable), "GenerateDrops");
+            overwriter.instance.Unpatch(
+                target,
+                HarmonyPatchType.Prefix,
+                overwriter.instance.Id
+            );
+            Debug.Log("GenerateDrops unpatched because levelup already patch it");
+        }
     }
 
     public override void AssetsLoaded(ICoreAPI api)
