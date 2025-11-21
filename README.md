@@ -18,9 +18,9 @@ Features:
 Everything is configurable, check the [wiki](https://github.com/LeandroTheDev/rpg_difficulty/wiki) for more informations about configurations
 
 ### Observations
-For the health system to work, we change the base max health when new entity spawn, ``for ever``, the  entity will always have that health on the world even if the mod is removed
+For the health system to work, we change the base max health when new entity spawn, the  entity will not lose that health if the mod is removed.
 
-For the damage system to work correctly the mod ``overwrites`` the damage configuration from assets and increase it, but if you remove the mod this ``overwrite`` will no longer exist, and the entity will have the previously damage from configuration.
+For the damage system to work we change the damage from the entity attack AI, removing the mod will remove the damage.
 
 For the harvest system to work correctly the mod ``overwrites`` the harvest system and increase the multiply result, if the mod is removed the additional multiply will no longer exist.
 
