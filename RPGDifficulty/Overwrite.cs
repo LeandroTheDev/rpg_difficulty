@@ -3,7 +3,6 @@ using HarmonyLib;
 using Vintagestory.API.Common;
 using Vintagestory.API.Datastructures;
 using Vintagestory.GameContent;
-using Newtonsoft.Json.Linq;
 using Vintagestory.API.Common.Entities;
 using Vintagestory.Server;
 using System.Reflection;
@@ -141,22 +140,24 @@ class DamageInteraction
 
     // Overwrite Knife Harvesting
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(EntityBehaviorHarvestable), "SetHarvested")]
-    public static void SetHarvestedKnifeStart(EntityBehaviorHarvestable __instance, IPlayer byPlayer, ref float dropQuantityMultiplier)
+    [HarmonyPatch(typeof(EntityBehaviorHarvestable), "GenerateDrops")]
+    public static void GenerateDropsStart(EntityBehaviorHarvestable __instance, IPlayer byPlayer)
     {
         // Check if player exist and options is enabled
-        if (byPlayer != null && Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0) return;
+        if (byPlayer == null || (Configuration.lootStatsIncreaseEveryDistance == 0 && Configuration.lootStatsIncreaseEveryHeight == 0 && Configuration.lootStatsIncreaseEveryAge == 0)) return;
 
         // Get the final droprate
         float dropRate = (float)Configuration.baseHarvest + (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseDistance");
         dropRate += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseHeight");
         dropRate += (float)__instance.entity.Attributes.GetDouble("RPGDifficultyLootStatsIncreaseAge");
 
-        dropQuantityMultiplier += dropRate;
-
         if (Configuration.enableStatusVariation)
-            dropQuantityMultiplier *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
+            dropRate *= (float)__instance.entity.Attributes.GetDouble("RPGDifficultyStatusVariation");
 
-        Debug.LogDebug($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {dropRate} base: {Configuration.baseHarvest}");
+        // Don't worry, it will be reseted automatically by the game
+        // 1 means 100%, luckly your base harvest in config is 0.0 so no changes needed
+        byPlayer.Entity.Stats.Set("animalLootDropRate", "animalLootDropRate", dropRate - 1f);
+
+        Debug.LogDebug($"{byPlayer.PlayerName} harvested any entity with knife, multiply drop: {byPlayer.Entity.Stats.GetBlended("animalLootDropRate")}");
     }
 }

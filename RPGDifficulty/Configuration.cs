@@ -89,7 +89,7 @@ public static class Configuration
     public static bool enableWhitelist = false;
     public static bool enableBlacklist = true;
     public static bool enableStatusIncreaseByHeight = true;
-    public static double baseHarvest = 0.5;
+    public static double baseHarvest = 0.0;
 
     public static bool enableStatusVariation = true;
     public static double minimumVariableStatusAverage = 0.5;
