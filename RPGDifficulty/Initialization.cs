@@ -27,7 +27,7 @@ public class Initialization : ModSystem
             {
                 Debug.Log("LevelUP is enabled, registering 'OnExperienceIncrease' event");
                 LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnExperienceIncrease;
-                LevelUP.Shared.OverwriteBlockInteractionEvents.OnKnifeHarvested += OnKnifeHarvested;
+                LevelUP.Server.LevelKnifeEvents.OnKnifeHarvested += OnKnifeHarvested;
             });
         }
 
