@@ -22,7 +22,7 @@ public class RPGDifficultyModSystem : ModSystem
         RegionSystem.Initialize(api);
         RegionAPI.Initialize(api);
 
-        api.ChatCommands.Create("rpgregion")
+        api.ChatCommands.Create("region")
             .WithDescription("Shows the current region zone and worldgen values at your position")
             .RequiresPrivilege(Privilege.chat)
             .HandleWith(args =>
