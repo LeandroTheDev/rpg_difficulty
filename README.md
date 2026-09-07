@@ -14,6 +14,7 @@ Features:
 - Increase by height
 - Increase by world age
 - Regions (random levels by ingame-regions calculated by temperature and rock types highly recommended using: [RPG Overlay](https://mods.vintagestory.at/rpgoverlay))
+- > Each position in the world is classified into a **zone** using worldgen-fixed data (climate maps and terrain height)
 - Status variations
 - Condition to spawn based on distance/height/age
 - [Level UP](https://mods.vintagestory.at/levelup) Mod increase experience based on distance/height/age

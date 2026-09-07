@@ -22,13 +22,25 @@ public class RPGDifficultyModSystem : ModSystem
         RegionSystem.Initialize(api);
         RegionAPI.Initialize(api);
 
+        api.ChatCommands.Create("rpgregion")
+            .WithDescription("Shows the current region zone and worldgen values at your position")
+            .RequiresPrivilege(Privilege.chat)
+            .HandleWith(args =>
+            {
+                IServerPlayer player = args.Caller.Player as IServerPlayer;
+                if (player?.Entity == null) return TextCommandResult.Error("No player entity");
+                string info = RegionSystem.GetDebugInfo(player.Entity.Pos.X, player.Entity.Pos.Z);
+                return TextCommandResult.Success(info);
+            });
+
         // Create the timer only with levelup compatibility
         if (api.ModLoader.IsModEnabled("levelup"))
         {
             Task.Run(() =>
             {
-                Logger.Log("LevelUP is enabled, registering 'OnExperienceIncrease' event");
+                Logger.Log("LevelUP is enabled, registering 'OnExperienceIncrease' and 'OnSubExperienceIncrease' events");
                 LevelUP.Server.ExperienceEvents.OnExperienceIncrease += LevelUPOnExperienceIncrease;
+                LevelUP.Server.ExperienceEvents.OnSubExperienceIncrease += LevelUPOnSubExperienceIncrease;
                 LevelUP.Server.LevelKnifeEvents.OnKnifeHarvested += OnKnifeHarvested;
             });
         }
@@ -126,6 +138,54 @@ public class RPGDifficultyModSystem : ModSystem
                 (Configuration.StatusRegion.levelUPExperienceModifierPerLevel * regionLevel)
             ));
         Logger.LogDebug($"[EXPERIENCE] After: {amount}");
+    }
+
+    private static void LevelUPOnSubExperienceIncrease(IPlayer player, string type, string subType, ref ulong amount)
+    {
+        int statsIncreaseDistance = 0;
+        int statsIncreaseHeight = 0;
+        int statsIncreaseAge = 0;
+
+        {
+            double entityX = player.Entity.Pos.X - serverAPI.World.DefaultSpawnPosition.X;
+            double entityZ = player.Entity.Pos.Z - serverAPI.World.DefaultSpawnPosition.Z;
+            double entityY = player.Entity.Pos.Y;
+
+            if (entityX < 0) entityX = Math.Abs(entityX);
+            if (entityZ < 0) entityZ = Math.Abs(entityZ);
+
+            if (Configuration.StatusDistance.enableStatusIncreaseByDistance)
+            {
+                statsIncreaseDistance = (int)(Math.Floor(entityX / Configuration.StatusDistance.increaseStatsEveryDistance) +
+                                              Math.Floor(entityZ / Configuration.StatusDistance.increaseStatsEveryDistance));
+            }
+
+            if (Configuration.StatusHeight.enableStatusIncreaseByHeight)
+            {
+                double heightDifference = Configuration.StatusHeight.baseStatusHeight - entityY;
+                if (heightDifference > 0)
+                {
+                    statsIncreaseHeight = (int)Math.Floor(heightDifference / Configuration.StatusHeight.increaseStatsEveryDownHeight);
+                }
+            }
+
+            if (Configuration.StatusAge.enableStatusIncreaseByAge)
+            {
+                statsIncreaseAge = Configuration.GetStatusByWorldAge(serverAPI);
+            }
+        }
+
+        int regionLevel = RegionSystem.GetRegionLevel(player.Entity.Pos.X, player.Entity.Pos.Z);
+
+        Logger.LogDebug($"[SUB-EXPERIENCE] {type}/{subType} Before: {amount}");
+        amount += (ulong)Math.Round(amount *
+            (
+                (Configuration.StatusDistance.levelUPExperienceIncreaseEveryDistance * statsIncreaseDistance) +
+                (Configuration.StatusHeight.levelUPExperienceIncreaseEveryHeight * statsIncreaseHeight) +
+                (Configuration.StatusAge.levelUPExperienceIncreaseEveryAge * statsIncreaseAge) +
+                (Configuration.StatusRegion.levelUPExperienceModifierPerLevel * regionLevel)
+            ));
+        Logger.LogDebug($"[SUB-EXPERIENCE] {type}/{subType} After: {amount}");
     }
 
     public override void Start(ICoreAPI api)

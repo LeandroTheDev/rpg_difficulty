@@ -12,19 +12,18 @@ public class RegionInfo
     public int RegionZ { get; init; }
     public int Level { get; init; }
     public bool IsInitialRegion { get; init; }
-    public string RockType { get; init; }
-    public string SurfaceType { get; init; }
+    public string Zone { get; init; }
 }
 
 public static class RegionAPI
 {
     /// <summary>
-    /// Fired when a player crosses into a different region (rock type or surface type boundary).
+    /// Fired when a player crosses into a different zone (climate or forest boundary).
     /// </summary>
     public static event Action<IServerPlayer, RegionInfo, RegionInfo> OnPlayerEnterRegion;
 
     private static ICoreServerAPI _api;
-    private static readonly Dictionary<string, (string rockType, string surfaceType)> _playerRegionKeys = new();
+    private static readonly Dictionary<string, string> _playerZones = new();
 
     internal static void Initialize(ICoreServerAPI api)
     {
@@ -36,16 +35,13 @@ public static class RegionAPI
 
     private static void OnPlayerJoin(IServerPlayer player)
     {
-        double posX = player.Entity.Pos.X;
-        double posZ = player.Entity.Pos.Z;
-        string rockType = RegionSystem.GetRockTypeAtPosition(posX, posZ);
-        string surfaceType = RegionSystem.GetSurfaceTypeAtPosition(posX, posZ);
-        _playerRegionKeys[player.PlayerUID] = (rockType, surfaceType);
+        string zone = RegionSystem.GetZoneAtPosition(player.Entity.Pos.X, player.Entity.Pos.Z);
+        _playerZones[player.PlayerUID] = zone;
     }
 
     private static void OnPlayerLeave(IServerPlayer player)
     {
-        _playerRegionKeys.Remove(player.PlayerUID);
+        _playerZones.Remove(player.PlayerUID);
     }
 
     private static void CheckPlayerRegions(float dt)
@@ -57,32 +53,30 @@ public static class RegionAPI
 
             double posX = player.Entity.Pos.X;
             double posZ = player.Entity.Pos.Z;
-            string newRockType = RegionSystem.GetRockTypeAtPosition(posX, posZ);
-            string newSurfaceType = RegionSystem.GetSurfaceTypeAtPosition(posX, posZ);
+            string newZone = RegionSystem.GetZoneAtPosition(posX, posZ);
 
-            if (!_playerRegionKeys.TryGetValue(player.PlayerUID, out var current))
+            if (!_playerZones.TryGetValue(player.PlayerUID, out string currentZone))
             {
-                _playerRegionKeys[player.PlayerUID] = (newRockType, newSurfaceType);
+                _playerZones[player.PlayerUID] = newZone;
                 continue;
             }
 
-            if (current.rockType == newRockType && current.surfaceType == newSurfaceType) continue;
+            if (currentZone == newZone) continue;
 
-            RegionInfo oldInfo = BuildRegionInfo(posX, posZ, current.rockType, current.surfaceType);
-            RegionInfo newInfo = BuildRegionInfo(posX, posZ, newRockType, newSurfaceType);
+            RegionInfo oldInfo = BuildRegionInfo(posX, posZ, currentZone);
+            RegionInfo newInfo = BuildRegionInfo(posX, posZ, newZone);
 
-            _playerRegionKeys[player.PlayerUID] = (newRockType, newSurfaceType);
+            _playerZones[player.PlayerUID] = newZone;
 
             RPGDifficultyModSystem.Logger.LogDebug(
-                $"[RegionAPI] {player.PlayerName} entered region rockType={newRockType} surfaceType={newSurfaceType} " +
-                $"level={newInfo.Level} initialRegion={newInfo.IsInitialRegion}"
+                $"[RegionAPI] {player.PlayerName} entered zone={newZone} level={newInfo.Level} initialRegion={newInfo.IsInitialRegion}"
             );
 
             OnPlayerEnterRegion?.Invoke(player, oldInfo, newInfo);
         }
     }
 
-    private static RegionInfo BuildRegionInfo(double posX, double posZ, string rockType, string surfaceType)
+    private static RegionInfo BuildRegionInfo(double posX, double posZ, string zone)
     {
         int regionSize = _api.World.BlockAccessor.RegionSize;
         int regionX = (int)(posX / regionSize);
@@ -101,10 +95,9 @@ public static class RegionAPI
         {
             RegionX = regionX,
             RegionZ = regionZ,
-            RockType = rockType,
-            SurfaceType = surfaceType,
-            Level = RegionSystem.GetRegionLevel(posX, posZ, rockType, surfaceType),
-            IsInitialRegion = isInitial
+            Zone = zone,
+            Level = RegionSystem.GetRegionLevel(posX, posZ, zone),
+            IsInitialRegion = isInitial,
         };
     }
 }
