@@ -165,10 +165,10 @@ public static class RegionSystem
         int level = GetRegionLevel(posX, posZ, zone);
 
         return $"Zone={zone} | Level={level}\n" +
-               $"WorldgenY={worldgenY} (mountain>={Configuration.StatusRegion.mountainAltitudeThreshold})\n" +
-               $"Temperature={climate?.WorldGenTemperature:F2} (arctic<=-16, sand>=8)\n" +
-               $"Fertility={climate?.Fertility:F3} (fertile/forest>=0.25)\n" +
-               $"ForestDensity={climate?.ForestDensity:F3} (forest>={Configuration.StatusRegion.forestDensityThreshold})\n" +
+               $"WorldgenY={worldgenY} (mountain&gt;={Configuration.StatusRegion.mountainAltitudeThreshold})\n" +
+               $"Temperature={climate?.WorldGenTemperature:F2} (arctic&lt;=-16, sand&gt;=8)\n" +
+               $"Fertility={climate?.Fertility:F3} (fertile/forest&gt;=0.25)\n" +
+               $"ForestDensity={climate?.ForestDensity:F3} (forest&gt;={Configuration.StatusRegion.forestDensityThreshold})\n" +
                $"Rainfall={climate?.WorldgenRainfall:F3}\n" +
                $"RockType={rockType}";
     }
